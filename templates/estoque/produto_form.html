@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-1">
+                    <i class="bi bi-box-seam text-primary me-2"></i>{{ titulo }}
+                </h2>
+                <p class="text-muted mb-0">Preencha os dados do produto e adicione as fotos de forma rápida.</p>
+            </div>
+            <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="glass-panel p-4 p-sm-5" id="form-produto">
+            {% csrf_token %}
+
+            <h5 class="fw-bold text-white mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                <i class="bi bi-info-circle text-primary me-2"></i>Informações Principais
+            </h5>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="{{ form.loja.id_for_label }}">Loja <span class="text-danger">*</span></label>
+                    {{ form.loja }}
+                    {% if form.loja.errors %}<div class="text-danger small mt-1">{{ form.loja.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="{{ form.nome.id_for_label }}">Nome do Produto <span class="text-danger">*</span></label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}<div class="text-danger small mt-1">{{ form.nome.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="{{ form.sku.id_for_label }}">SKU / Código Interno</label>
+                    {{ form.sku }}
+                    {% if form.sku.errors %}<div class="text-danger small mt-1">{{ form.sku.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="{{ form.preco_custo.id_for_label }}">Preço de Custo (R$) <span class="text-danger">*</span></label>
+                    {{ form.preco_custo }}
+                    {% if form.preco_custo.errors %}<div class="text-danger small mt-1">{{ form.preco_custo.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="{{ form.preco_venda.id_for_label }}">Preço de Venda (R$) <span class="text-danger">*</span></label>
+                    {{ form.preco_venda }}
+                    {% if form.preco_venda.errors %}<div class="text-danger small mt-1">{{ form.preco_venda.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.descricao.id_for_label }}">Descrição do Produto</label>
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}<div class="text-danger small mt-1">{{ form.descricao.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check form-switch mt-2">
+                        {{ form.ativo }}
+                        <label class="form-check-label text-light fw-medium" for="{{ form.ativo.id_for_label }}">
+                            Produto Ativo (disponível para vendas)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-white mb-3 pb-2 border-bottom border-secondary border-opacity-25 d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-images text-info me-2"></i>Imagens do Produto</span>
+                <small class="text-muted fs-6 fw-normal">Upload do dispositivo ou captura instantânea por câmera</small>
+            </h5>
+
+            <!-- Foto Principal -->
+            <div class="mb-4 p-3 bg-dark bg-opacity-40 rounded-3 border border-secondary border-opacity-25">
+                <label class="form-label fw-bold text-white mb-2" for="{{ form.foto_principal.id_for_label }}">
+                    Foto Principal (Capa)
+                </label>
+                <div class="row align-items-center g-3">
+                    <div class="col-12 col-md-7">
+                        {{ form.foto_principal }}
+                        <div class="mt-2 d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-sm btn-info text-dark fw-bold rounded-pill px-3" onclick="abrirCamera('{{ form.foto_principal.id_for_label }}', 'preview-principal')">
+                                <i class="bi bi-camera-fill me-1"></i> Tirar Foto com a Câmera
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-1">Formato imagem (JPG, PNG, WEBP). Máximo 5MB.</small>
+                        {% if form.foto_principal.errors %}<div class="text-danger small mt-1">{{ form.foto_principal.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-12 col-md-5 text-center">
+                        <div id="container-preview-principal" class="p-2 border border-secondary border-opacity-25 rounded bg-dark" style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                            {% if produto and produto.foto_principal %}
+                                <img id="preview-principal" src="{{ produto.foto_principal.url }}" alt="Foto Principal" class="rounded" style="max-height: 120px; max-width: 100%; object-fit: cover;">
+                            {% else %}
+                                <img id="preview-principal" src="" alt="Pré-visualização" class="rounded d-none" style="max-height: 120px; max-width: 100%; object-fit: cover;">
+                                <span id="placeholder-principal" class="text-muted small"><i class="bi bi-image fs-3 d-block mb-1"></i>Nenhuma foto selecionada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fotos Secundárias (Formset até 4 fotos) -->
+            <div class="mb-4">
+                <label class="form-label d-block fw-bold text-white mb-2">Fotos Secundárias (Até 4 fotos)</label>
+                {{ formset.management_form }}
+                <div class="row g-3">
+                    {% for foto_form in formset %}
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                            {{ foto_form.id }}
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="badge bg-secondary">Foto {{ forloop.counter }}</span>
+                                    <button type="button" class="btn btn-sm btn-outline-info p-1 px-2 text-info rounded-circle" title="Tirar foto com a câmera" onclick="abrirCamera('{{ foto_form.foto.id_for_label }}', 'preview-sec-{{ forloop.counter }}')">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </button>
+                                </div>
+                                {{ foto_form.foto }}
+                                {% if foto_form.foto.errors %}<div class="text-danger small mt-1">{{ foto_form.foto.errors.0 }}</div>{% endif %}
+                            </div>
+
+                            <div class="text-center my-2">
+                                {% if foto_form.instance.pk and foto_form.instance.foto %}
+                                    <img id="preview-sec-{{ forloop.counter }}" src="{{ foto_form.instance.foto.url }}" alt="Foto Secundária" class="rounded border border-secondary border-opacity-25" style="max-height: 90px; width: 100%; object-fit: cover;">
+                                {% else %}
+                                    <img id="preview-sec-{{ forloop.counter }}" src="" alt="Foto Secundária" class="rounded border border-secondary border-opacity-25 d-none" style="max-height: 90px; width: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+
+                            {% if foto_form.instance.pk and foto_form.instance.foto %}
+                            <div class="form-check text-danger small mt-2">
+                                {{ foto_form.DELETE }}
+                                <label class="form-check-label" for="{{ foto_form.DELETE.id_for_label }}">Remover esta foto</label>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">Cancelar</a>
+                <button type="submit" class="btn btn-primary-custom px-4">
+                    <i class="bi bi-check-circle me-1"></i> Salvar Produto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal da Câmera -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-panel border-0 text-white">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-camera-fill text-info me-2"></i>Capturar Foto da Câmera
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="fecharCamera()"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <div class="position-relative bg-black rounded-3 overflow-hidden shadow-inner d-flex align-items-center justify-content-center" style="min-height: 280px; max-height: 380px;">
+                    <video id="video-stream" autoplay playsinline class="w-100 h-100" style="object-fit: cover;"></video>
+                    <canvas id="canvas-capture" class="d-none"></canvas>
+                </div>
+                <div id="camera-status" class="small text-muted mt-2">Iniciando câmera do dispositivo...</div>
+            </div>
+            <div class="modal-footer border-top border-secondary border-opacity-25 justify-content-between">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill" onclick="alternarCamera()">
+                    <i class="bi bi-arrow-repeat me-1"></i> Alternar Câmera
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary-custom btn-sm" data-bs-dismiss="modal" onclick="fecharCamera()">Cancelar</button>
+                    <button type="button" class="btn btn-info text-dark fw-bold btn-sm rounded-pill px-3" onclick="capturarFoto()">
+                        <i class="bi bi-camera me-1"></i> Capturar e Usar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentStream = null;
+    let targetInputId = null;
+    let targetPreviewId = null;
+    let currentFacingMode = "environment"; // Prioriza câmera traseira em celulares
+
+    async function abrirCamera(inputId, previewId) {
+        targetInputId = inputId;
+        targetPreviewId = previewId;
+
+        const modalEl = document.getElementById('cameraModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        await iniciarStream();
+    }
+
+    async function iniciarStream() {
+        const video = document.getElementById('video-stream');
+        const statusEl = document.getElementById('camera-status');
+
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+
+        try {
+            statusEl.textContent = "Acessando câmera...";
+            currentStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
+            video.srcObject = currentStream;
+            statusEl.textContent = "Câmera pronta! Posicione o produto e clique em 'Capturar e Usar'.";
+        } catch (err) {
+            console.error("Erro ao acessar câmera:", err);
+            statusEl.textContent = "Não foi possível acessar a câmera. Verifique as permissões do navegador.";
+        }
+    }
+
+    async function alternarCamera() {
+        currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+        await iniciarStream();
+    }
+
+    function fecharCamera() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+        }
+    }
+
+    function capturarFoto() {
+        const video = document.getElementById('video-stream');
+        const canvas = document.getElementById('canvas-capture');
+        const context = canvas.getContext('2d');
+
+        if (!video.videoWidth) {
+            alert("A câmera ainda não está pronta.");
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function(blob) {
+            const fileName = `foto_camera_${Date.now()}.jpg`;
+            const file = new File([blob], fileName, { type: "image/jpeg" });
+
+            // Atribuir o arquivo ao input File correspondente via DataTransfer
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+
+            const inputEl = document.getElementById(targetInputId);
+            if (inputEl) {
+                inputEl.files = dataTransfer.files;
+            }
+
+            // Atualizar imagem de pré-visualização
+            const previewImg = document.getElementById(targetPreviewId);
+            if (previewImg) {
+                previewImg.src = URL.createObjectURL(file);
+                previewImg.classList.remove('d-none');
+            }
+
+            const placeholder = document.getElementById('placeholder-principal');
+            if (placeholder && targetPreviewId === 'preview-principal') {
+                placeholder.classList.add('d-none');
+            }
+
+            fecharCamera();
+            const modalEl = document.getElementById('cameraModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }, 'image/jpeg', 0.9);
+    }
+</script>
+{% endblock %}

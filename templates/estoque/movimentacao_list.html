@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Histórico de Movimentações — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h2 class="fw-bold text-white mb-1">
+            <i class="bi bi-journal-text text-primary me-2"></i>Histórico de Movimentações
+        </h2>
+        <p class="text-muted mb-0">Registro auditável de todas as entradas e saídas de produtos.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'estoque:produto_list' %}" class="btn btn-primary-custom">
+            <i class="bi bi-box-seam me-1"></i> Ir para Produtos
+        </a>
+    </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="glass-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-12 col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary border-opacity-25 text-muted">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar por produto ou observação...">
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <select name="tipo" class="form-select" onchange="this.form.submit()">
+                <option value="">Todos os Tipos</option>
+                <option value="ENTRADA" {% if selected_tipo == "ENTRADA" %}selected{% endif %}>Entrada (Reposição)</option>
+                <option value="SAIDA" {% if selected_tipo == "SAIDA" %}selected{% endif %}>Saída (Venda)</option>
+            </select>
+        </div>
+
+        {% if is_admin_master %}
+        <div class="col-12 col-md-3">
+            <select name="loja_id" class="form-select" onchange="this.form.submit()">
+                <option value="">Todas as Lojas</option>
+                {% for loja in lojas_filtro %}
+                    <option value="{{ loja.id }}" {% if selected_loja_id == loja.id|stringformat:"s" %}selected{% endif %}>{{ loja.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-secondary-custom w-100">Filtrar</button>
+            {% if query or selected_tipo or selected_loja_id %}
+                <a href="{% url 'estoque:movimentacao_list' %}" class="btn btn-outline-danger border-opacity-25 text-danger rounded-3" title="Limpar Filtros">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- History Table -->
+{% if movimentacoes %}
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Data / Hora</th>
+                    <th>Produto</th>
+                    {% if is_admin_master %}<th>Loja</th>{% endif %}
+                    <th>Tipo</th>
+                    <th>Qtd</th>
+                    <th>Preço Venda Unit.</th>
+                    <th>Lucro da Venda</th>
+                    <th>Usuário</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in movimentacoes %}
+                <tr>
+                    <td class="text-muted small">
+                        {{ mov.criado_em|date:"d/m/Y H:i" }}
+                    </td>
+                    <td>
+                        <div class="fw-bold text-white mb-0">{{ mov.produto.nome }}</div>
+                        <small class="text-muted font-monospace">SKU: {{ mov.produto.sku|default:"N/A" }}</small>
+                    </td>
+                    {% if is_admin_master %}
+                    <td>
+                        <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                            {{ mov.produto.loja.nome }}
+                        </span>
+                    </td>
+                    {% endif %}
+                    <td>
+                        {% if mov.tipo == 'ENTRADA' %}
+                            <span class="badge badge-entrada">
+                                <i class="bi bi-arrow-down-left me-1"></i> Entrada
+                            </span>
+                        {% else %}
+                            <span class="badge badge-saida">
+                                <i class="bi bi-arrow-up-right me-1"></i> Saída
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="fw-bold text-light">
+                        {{ mov.quantidade }} unid.
+                    </td>
+                    <td class="text-muted">
+                        {% if mov.preco_venda_unitario %}
+                            R$ {{ mov.preco_venda_unitario|floatformat:2 }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if mov.tipo == 'SAIDA' %}
+                            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 fw-bold">
+                                + R$ {{ mov.lucro|floatformat:2 }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="small text-light"><i class="bi bi-person me-1 text-muted"></i> {{ mov.usuario.username }}</div>
+                    </td>
+                    <td class="text-muted small">
+                        {{ mov.observacao|default:"—" }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="glass-panel p-5 text-center my-4">
+    <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+    <h5 class="text-white fw-bold mb-1">Nenhuma movimentação registrada</h5>
+    <p class="text-muted">Não há registros de entradas ou saídas correspondentes aos filtros selecionados.</p>
+</div>
+{% endif %}
+{% endblock %}

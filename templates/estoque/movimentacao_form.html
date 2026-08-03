@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Movimentar Estoque — {{ produto.nome }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-1">
+                    <i class="bi bi-arrow-left-right text-success me-2"></i>Movimentar Estoque
+                </h2>
+                <p class="text-muted mb-0">Registre uma Entrada (reposição) ou Saída (venda).</p>
+            </div>
+            <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+
+        <!-- Product Summary Card -->
+        <div class="glass-panel p-3 mb-4 d-flex align-items-center gap-3">
+            {% if produto.foto_principal %}
+                <img src="{{ produto.foto_principal.url }}" alt="{{ produto.nome }}" class="rounded" style="width: 64px; height: 64px; object-fit: cover;">
+            {% else %}
+                <div class="rounded bg-dark d-flex align-items-center justify-content-center text-muted border border-secondary border-opacity-25" style="width: 64px; height: 64px;">
+                    <i class="bi bi-box-seam fs-3"></i>
+                </div>
+            {% endif %}
+            <div class="flex-grow-1">
+                <h5 class="fw-bold text-white mb-1">{{ produto.nome }}</h5>
+                <div class="d-flex flex-wrap gap-2 text-muted small">
+                    <span><i class="bi bi-shop me-1"></i>{{ produto.loja.nome }}</span>
+                    <span>&bull;</span>
+                    <span>SKU: <code>{{ produto.sku|default:"N/A" }}</code></span>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="small text-muted">Estoque Atual:</div>
+                <div class="fs-4 fw-bold {% if produto.quantidade_atual > 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ produto.quantidade_atual }} <span class="fs-6 font-normal">unid.</span>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" class="glass-panel p-4 p-sm-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show text-start py-2 px-3 small mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Tipo de Movimentação -->
+            <div class="mb-4">
+                <label class="form-label" for="{{ form.tipo.id_for_label }}">Tipo de Movimentação <span class="text-danger">*</span></label>
+                {{ form.tipo }}
+                {% if form.tipo.errors %}<div class="text-danger small mt-1">{{ form.tipo.errors.0 }}</div>{% endif %}
+            </div>
+
+            <!-- Quantidade -->
+            <div class="mb-4">
+                <label class="form-label" for="{{ form.quantidade.id_for_label }}">Quantidade <span class="text-danger">*</span></label>
+                {{ form.quantidade }}
+                <small class="text-muted">Unidades a adicionar (Entrada) ou retirar (Saída).</small>
+                {% if form.quantidade.errors %}<div class="text-danger small mt-1">{{ form.quantidade.errors.0 }}</div>{% endif %}
+            </div>
+
+            <!-- Preço de Venda Unitário (Aparece dinamicamente na Saída) -->
+            <div class="mb-4" id="div_preco_venda">
+                <label class="form-label" for="{{ form.preco_venda_unitario.id_for_label }}">
+                    Preço de Venda Unitário Praticado (R$) <span class="text-danger">*</span>
+                </label>
+                {{ form.preco_venda_unitario }}
+                <small class="text-muted d-block mt-1">Preço praticado nesta venda (custo cadastrado: R$ {{ produto.preco_custo|floatformat:2 }}).</small>
+                {% if form.preco_venda_unitario.errors %}<div class="text-danger small mt-1">{{ form.preco_venda_unitario.errors.0 }}</div>{% endif %}
+            </div>
+
+            <!-- Card com Cálculo em Tempo Real do Lucro -->
+            <div class="p-3 mb-4 rounded-3 bg-dark bg-opacity-75 border border-success border-opacity-25 d-none" id="card_lucro_estimado">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="text-muted small fw-semibold"><i class="bi bi-calculator me-1 text-success"></i> Lucro Estimado desta Venda:</span>
+                    <span class="fs-5 fw-bold text-success" id="val_lucro_estimado">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Observação -->
+            <div class="mb-4">
+                <label class="form-label" for="{{ form.observacao.id_for_label }}">Observação / Motivo</label>
+                {{ form.observacao }}
+                {% if form.observacao.errors %}<div class="text-danger small mt-1">{{ form.observacao.errors.0 }}</div>{% endif %}
+            </div>
+
+            <!-- Botões -->
+            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">Cancelar</a>
+                <button type="submit" class="btn btn-primary-custom px-4">
+                    <i class="bi bi-check-circle me-1"></i> Confirmar Movimentação
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectTipo = document.getElementById('id_tipo_movimentacao');
+        const divPrecoVenda = document.getElementById('div_preco_venda');
+        const inputPrecoVenda = document.getElementById('id_preco_venda_unitario');
+        const inputQtd = document.getElementById('id_quantidade');
+        const cardLucro = document.getElementById('card_lucro_estimado');
+        const valLucro = document.getElementById('val_lucro_estimado');
+
+        const precoCusto = parseFloat('{{ produto.preco_custo|stringformat:".2f" }}') || 0;
+
+        function atualizarInterface() {
+            if (selectTipo.value === 'SAIDA') {
+                divPrecoVenda.classList.remove('d-none');
+                cardLucro.classList.remove('d-none');
+                calcularLucro();
+            } else {
+                divPrecoVenda.classList.add('d-none');
+                cardLucro.classList.add('d-none');
+            }
+        }
+
+        function calcularLucro() {
+            const qtd = parseInt(inputQtd.value) || 0;
+            const precoVenda = parseFloat(inputPrecoVenda.value) || 0;
+            if (qtd > 0 && precoVenda > 0) {
+                const lucro = (precoVenda - precoCusto) * qtd;
+                valLucro.textContent = 'R$ ' + lucro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            } else {
+                valLucro.textContent = 'R$ 0,00';
+            }
+        }
+
+        selectTipo.addEventListener('change', atualizarInterface);
+        inputPrecoVenda.addEventListener('input', calcularLucro);
+        inputQtd.addEventListener('input', calcularLucro);
+
+        atualizarInterface();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Lucros — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-7">
+        <h2 class="fw-bold text-white mb-1">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i>Dashboard de Lucros
+        </h2>
+        <p class="text-muted mb-0">Visão geral do desempenho financeiro, estoque e movimentações.</p>
+    </div>
+    
+    {% if is_admin_master %}
+    <div class="col-md-5 mt-3 mt-md-0 text-md-end">
+        <form method="get" class="d-inline-flex gap-2 align-items-center bg-dark p-2 rounded-3 border border-secondary border-opacity-25">
+            <label for="loja_select" class="text-muted small fw-semibold text-nowrap mb-0"><i class="bi bi-shop me-1"></i>Filtrar Loja:</label>
+            <select name="loja_id" id="loja_select" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">Todas as Lojas (Consolidado)</option>
+                {% for loja in lojas_filtro %}
+                    <option value="{{ loja.id }}" {% if selected_loja_id == loja.id|stringformat:"s" %}selected{% endif %}>{{ loja.nome }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="row g-3 mb-4">
+    <!-- Lucro Acumulado -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="glass-panel kpi-card success">
+            <div class="kpi-label">Lucro Geral Acumulado</div>
+            <div class="kpi-value text-success">R$ {{ lucro_total|floatformat:2 }}</div>
+            <div class="small text-muted mt-2">
+                <i class="bi bi-cash-stack me-1"></i> (Preço Venda - Custo) &times; Qtd
+            </div>
+        </div>
+    </div>
+
+    <!-- Valor Total em Vendas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="glass-panel kpi-card">
+            <div class="kpi-label">Faturamento Total</div>
+            <div class="kpi-value">R$ {{ total_vendas_valor|floatformat:2 }}</div>
+            <div class="small text-muted mt-2">
+                <i class="bi bi-receipt me-1"></i> Total bruto de saídas
+            </div>
+        </div>
+    </div>
+
+    <!-- Total de Unidades Vendidas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="glass-panel kpi-card info">
+            <div class="kpi-label">Unidades Vendidas</div>
+            <div class="kpi-value text-info">{{ total_saidas_qtd }} <span class="fs-6 text-muted font-normal">unid.</span></div>
+            <div class="small text-muted mt-2">
+                <i class="bi bi-box-arrow-right me-1"></i> Total em movimentações
+            </div>
+        </div>
+    </div>
+
+    <!-- Total em Estoque -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="glass-panel kpi-card warning">
+            <div class="kpi-label">Estoque Atual Disponível</div>
+            <div class="kpi-value text-warning">{{ total_estoque_unidades }} <span class="fs-6 text-muted font-normal">unid.</span></div>
+            <div class="small text-muted mt-2">
+                <i class="bi bi-boxes me-1"></i> {{ total_produtos }} produto(s) cadastrado(s)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Gráfico de Lucro Mensal -->
+    <div class="{% if is_admin_master %}col-lg-8{% else %}col-12{% endif %}">
+        <div class="glass-panel p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-white mb-0">
+                    <i class="bi bi-graph-up me-2 text-primary"></i>Evolução de Lucro Mensal (Últimos 12 Meses)
+                </h5>
+                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">Lucro Liquido</span>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="chartLucroMensal"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico Comparativo entre Lojas (Exclusivo Admin Master) -->
+    {% if is_admin_master %}
+    <div class="col-lg-4">
+        <div class="glass-panel p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-white mb-0">
+                    <i class="bi bi-shop me-2 text-info"></i>Lucro por Loja
+                </h5>
+                <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-25">Comparativo</span>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="chartComparativoLojas"></canvas>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="glass-panel p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h6 class="fw-bold text-white mb-1">Ações Rápidas de Estoque</h6>
+                <p class="text-muted small mb-0">Gerencie seus produtos, registre reposições ou efetue vendas rápidas.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'estoque:produto_create' %}" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-lg me-1"></i> Cadastrar Produto
+                </a>
+                <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">
+                    <i class="bi bi-list-task me-1"></i> Listar Produtos
+                </a>
+                <a href="{% url 'estoque:movimentacao_list' %}" class="btn btn-secondary-custom">
+                    <i class="bi bi-journal-text me-1"></i> Histórico de Movimentações
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Dados vindos do Django via JSON
+        const mesesLabels = JSON.parse('{{ chart_meses_json|safe }}');
+        const lucrosMensais = JSON.parse('{{ chart_lucros_json|safe }}');
+
+        // Configuração do Gráfico de Linha (Evolução Mensal)
+        const ctxMensal = document.getElementById('chartLucroMensal').getContext('2d');
+        
+        const gradientLine = ctxMensal.createLinearGradient(0, 0, 0, 300);
+        gradientLine.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradientLine.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+        new Chart(ctxMensal, {
+            type: 'line',
+            data: {
+                labels: mesesLabels,
+                datasets: [{
+                    label: 'Lucro (R$)',
+                    data: lucrosMensais,
+                    borderColor: '#6366f1',
+                    borderWidth: 3,
+                    backgroundColor: gradientLine,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' Lucro: R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: function(value) { return 'R$ ' + value; }
+                        }
+                    }
+                }
+            }
+        });
+
+        {% if is_admin_master %}
+        // Configuração do Gráfico de Rosca / Barras (Comparativo de Lojas)
+        const lojasLabels = JSON.parse('{{ chart_lojas_json|safe }}');
+        const lojasLucros = JSON.parse('{{ chart_lojas_lucros_json|safe }}');
+
+        const ctxLojas = document.getElementById('chartComparativoLojas').getContext('2d');
+        new Chart(ctxLojas, {
+            type: 'doughnut',
+            data: {
+                labels: lojasLabels,
+                datasets: [{
+                    data: lojasLucros,
+                    backgroundColor: [
+                        '#6366f1',
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#8b5cf6',
+                        '#06b6d4'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', padding: 15 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}

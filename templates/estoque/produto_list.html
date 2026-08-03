@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Produtos — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h2 class="fw-bold text-white mb-1">
+            <i class="bi bi-box-seam text-primary me-2"></i>Gestão de Produtos
+        </h2>
+        <p class="text-muted mb-0">Cadastre, edite e gerencie o estoque dos produtos.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'estoque:produto_create' %}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> Novo Produto
+        </a>
+    </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="glass-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-12 col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary border-opacity-25 text-muted">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar por nome, SKU ou descrição...">
+            </div>
+        </div>
+
+        {% if is_admin_master %}
+        <div class="col-12 col-md-4">
+            <select name="loja_id" class="form-select" onchange="this.form.submit()">
+                <option value="">Todas as Lojas</option>
+                {% for loja in lojas_filtro %}
+                    <option value="{{ loja.id }}" {% if selected_loja_id == loja.id|stringformat:"s" %}selected{% endif %}>{{ loja.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        <div class="col-12 col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-secondary-custom w-100">Filtrar</button>
+            {% if query or selected_loja_id %}
+                <a href="{% url 'estoque:produto_list' %}" class="btn btn-outline-danger border-opacity-25 text-danger rounded-3" title="Limpar Filtros">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Products Table / Cards -->
+{% if produtos %}
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Imagem</th>
+                    <th>Produto</th>
+                    <th>SKU</th>
+                    {% if is_admin_master %}<th>Loja</th>{% endif %}
+                    <th>Preço Custo</th>
+                    <th>Preço Venda</th>
+                    <th>Estoque Atual</th>
+                    <th>Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr class="{% if not produto.ativo %}opacity-50{% endif %}">
+                    <td>
+                        {% if produto.foto_principal %}
+                            <img src="{{ produto.foto_principal.url }}" alt="{{ produto.nome }}" class="rounded shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded bg-dark d-flex align-items-center justify-content-center text-muted border border-secondary border-opacity-25" style="width: 48px; height: 48px;">
+                                <i class="bi bi-image fs-4"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold text-white mb-0">{{ produto.nome }}</div>
+                        {% if produto.descricao %}
+                            <small class="text-muted text-truncate d-block" style="max-width: 250px;">{{ produto.descricao }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-dark text-muted border border-secondary border-opacity-25 font-monospace">
+                            {{ produto.sku|default:"N/A" }}
+                        </span>
+                    </td>
+                    {% if is_admin_master %}
+                    <td>
+                        <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                            {{ produto.loja.nome }}
+                        </span>
+                    </td>
+                    {% endif %}
+                    <td class="text-muted">R$ {{ produto.preco_custo|floatformat:2 }}</td>
+                    <td class="fw-semibold text-success">R$ {{ produto.preco_venda|floatformat:2 }}</td>
+                    <td>
+                        {% if produto.quantidade_atual > 0 %}
+                            <span class="badge badge-entrada">
+                                <i class="bi bi-box-seam me-1"></i> {{ produto.quantidade_atual }} unid.
+                            </span>
+                        {% else %}
+                            <span class="badge badge-saida">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Esgotado (0)
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if produto.ativo %}
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'estoque:movimentacao_create' produto.id %}" class="btn btn-outline-success rounded-start" title="Registrar Entrada/Saída">
+                                <i class="bi bi-arrow-left-right"></i> Movimentar
+                            </a>
+                            <a href="{% url 'estoque:produto_update' produto.id %}" class="btn btn-outline-light" title="Editar Produto">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'estoque:produto_toggle_status' produto.id %}" class="btn btn-outline-warning rounded-end" title="{% if produto.ativo %}Desativar{% else %}Ativar{% endif %} (Soft Delete)" onclick="return confirm('Deseja realmente {% if produto.ativo %}desativar{% else %}ativar{% endif %} este produto?');">
+                                <i class="bi {% if produto.ativo %}bi-eye-slash{% else %}bi-eye{% endif %}"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="glass-panel p-5 text-center my-4">
+    <i class="bi bi-box-seam fs-1 text-muted d-block mb-3"></i>
+    <h5 class="text-white fw-bold mb-1">Nenhum produto encontrado</h5>
+    <p class="text-muted">Não há produtos cadastrados ou correspondentes aos filtros selecionados.</p>
+    <a href="{% url 'estoque:produto_create' %}" class="btn btn-primary-custom mt-2">
+        <i class="bi bi-plus-lg me-1"></i> Cadastrar Primeiro Produto
+    </a>
+</div>
+{% endif %}
+{% endblock %}
