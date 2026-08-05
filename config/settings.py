@@ -72,10 +72,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração de Banco de Dados (MySQL ou SQLite para rápida execução/testes)
-USE_MYSQL = os.getenv('USE_MYSQL', 'False').lower() in ('true', '1', 't')
+# Configuração de Banco de Dados
+# Prioridade: DATABASE_URL (Vercel/Neon) > MySQL > SQLite (local dev)
+DATABASE_URL = os.getenv('DATABASE_URL', '')
 
-if USE_MYSQL:
+if DATABASE_URL:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
+elif os.getenv('USE_MYSQL', 'False').lower() in ('true', '1', 't'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -96,6 +107,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
 
 # Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
