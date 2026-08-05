@@ -36,3 +36,13 @@ Este documento registra as decisões técnicas e de arquitetura tomadas durante 
 ### Decisão 6: Remoção de Referências Externas de API e Captura Rápida por Câmera
 - **Motivo:** A pedido do usuário, a menção ao nome da API ("Cloudinary") foi totalmente removida das telas e cabeçalhos da aplicação.
 - **Ação:** Adicionado um módulo de **Captura Instantânea de Câmera** utilizando HTML5 `getUserMedia` e `DataTransfer`. O usuário pode clicar no botão **"Tirar Foto com a Câmera"**, abrir o modal com stream ao vivo da câmera do dispositivo (celular ou computador) e atribuir a foto capturada diretamente ao produto em segundos.
+
+---
+
+### Decisão 7: Configuração para Deploy no Vercel (Serverless)
+- **Motivo:** Preparar a aplicação para rodar como Serverless Functions no Vercel, servindo arquivos estáticos e contornando a natureza read-only do disco temporário.
+- **Ação:** 
+  1. Criação do arquivo de configuração `vercel.json` na raiz mapeando rotas estáticas e o endpoint do Django WSGI.
+  2. Inclusão de `app = application` no arquivo `config/wsgi.py` como entrypoint do Vercel.
+  3. Adição e configuração da biblioteca `whitenoise` para empacotamento, compactação e serviço eficiente de arquivos estáticos diretamente pelo Django.
+  4. Ajuste das configurações de `ALLOWED_HOSTS` para aceitar dinamicamente subdomínios do tipo `*.vercel.app`.
