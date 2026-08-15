@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felipe Cell | Loja de Celulares e Assistência Técnica em Porto do Mangue</title>
+    <meta name="description" content="iPhones selecionados com garantia, acessórios de primeira linha e conserto rápido pro seu celular em Porto do Mangue. Agilidade, honestidade e peças de procedência.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: '#1e61e8',
+                        brandBlueHover: '#1850c4',
+                        brandDark: '#202224',
+                        brandCard: '#27292c',
+                        brandBorder: '#34373b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #202224;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+
+        .loader-active {
+            overflow: hidden;
+        }
+
+        /* Tooltip de redes sociais */
+        .social-link:hover .tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .social-link:hover .hover-bg {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .social-link:hover .icon-wrapper {
+            color: #ffffff;
+        }
+
+        /* Estilos da galeria inclinada */
+        .sessao-galeria {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding: 2.5rem 0 3.5rem 0;
+            background-color: transparent;
+        }
+
+        .container-inclinado {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            transform: rotate(-2.5deg) scale(1.04);
+            width: 130vw;
+            margin-left: -15vw;
+        }
+
+        .trilha {
+            display: flex;
+            gap: 1.25rem;
+            width: 100%;
+            position: relative;
+            height: 165px;
+            overflow: hidden;
+        }
+
+        .showcase-card {
+            width: 270px;
+            height: 165px;
+            flex-shrink: 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #34373b;
+            cursor: pointer;
+            position: relative;
+            background-color: #27292c;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .showcase-card:hover {
+            border-color: #1e61e8;
+        }
+
+        @media (max-width: 768px) {
+            .container-inclinado {
+                transform: rotate(-1.5deg) scale(1.02);
+                width: 160vw;
+                margin-left: -30vw;
+                gap: 0.85rem;
+            }
+            .trilha {
+                gap: 0.85rem;
+                height: 125px;
+            }
+            .showcase-card {
+                width: 190px;
+                height: 125px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-white min-h-screen flex flex-col items-center loader-active antialiased selection:bg-brandBlue selection:text-white">
+
+    <!-- TELA DE CARREGAMENTO (LOADER) -->
+    <div id="loader-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-brandDark transition-opacity duration-500 ease-in-out">
+        <div class="flex flex-col items-center justify-center text-center p-6 space-y-5">
+            <img src="videos/video777.webp" alt="Carregando..." class="max-w-[260px] sm:max-w-[300px] w-full h-auto object-contain">
+            
+            <!-- Barra de Progresso -->
+            <div class="w-48 sm:w-60 h-1.5 bg-white/10 rounded overflow-hidden relative">
+                <div id="progress-bar" class="h-full bg-brandBlue transition-all duration-200 ease-out w-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL DA PÁGINA -->
+    <div id="main-content" class="w-full min-h-screen flex flex-col justify-between items-center opacity-0 transition-opacity duration-700 ease-out">
+        
+        <!-- CABEÇALHO / HEADER REFINADO (ESTILO APPLE / OPPO / TECH MINIMALISTA) -->
+        <header class="sticky top-0 z-40 w-full bg-brandDark/85 backdrop-blur-md border-b border-brandBorder transition-all duration-200">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-6">
+                <!-- Logo Brand -->
+                <a href="#" class="flex items-center group shrink-0 transition-opacity hover:opacity-90">
+                    <img src="imgs/logob001.webp" alt="Felipe Cell Logo" class="h-7 sm:h-8 w-auto object-contain">
+                </a>
+
+                <!-- Navegação Desktop (Estilo Tech Minimalista) -->
+                <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-[13px] font-medium text-neutral-400">
+                    <a href="#assistencia" class="hover:text-white transition-colors duration-150 whitespace-nowrap">Assistência Técnica</a>
+                    <a href="#loja" class="hover:text-white transition-colors duration-150 whitespace-nowrap">iPhones & Loja</a>
+                    <a href="#bastidores" class="hover:text-white transition-colors duration-150 whitespace-nowrap">Nossa Oficina</a>
+                    <a href="#diferenciais" class="hover:text-white transition-colors duration-150 whitespace-nowrap">Diferenciais</a>
+                    <a href="#contato" class="hover:text-white transition-colors duration-150 whitespace-nowrap">Onde Estamos</a>
+                </nav>
+
+                <!-- CTA Header WhatsApp -->
+                <div class="flex items-center shrink-0">
+                    <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 text-xs font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded-full transition-all duration-200 shadow-sm hover:scale-[1.02] active:scale-[0.98]">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                        <span class="whitespace-nowrap">Falar com a Equipe</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- CORPO DA PÁGINA COM HIERARQUIA EDITORIAL MODULAR -->
+        <main class="w-full flex-1 flex flex-col items-center justify-start px-4 sm:px-6 pt-6 sm:pt-10 pb-20 space-y-16 sm:space-y-24 max-w-6xl mx-auto">
+            
+            <!-- ==========================================
+                 BLOCO 1: HERO SECTION (EDITORIAL & VSL DE ALTO IMPACTO)
+            =========================================== -->
+            <section class="w-full flex flex-col items-center text-center space-y-8 pt-4 sm:pt-8 animate-fade-in">
+                
+                <!-- Badge de Localização e Propósito -->
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brandBorder bg-brandCard/60 text-xs font-semibold uppercase tracking-widest text-neutral-300">
+                    <span>Porto do Mangue • Loja e Oficina Especializada</span>
+                </div>
+
+                <!-- Título e Subtítulo Hero -->
+                <div class="max-w-4xl space-y-5 mx-auto">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-white tracking-tight leading-[1.15]">
+                        Seu celular novo ou consertado no capricho com rapidez e qualidade.
+                    </h1>
+                    
+                    <p class="text-neutral-300 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-normal">
+                        iPhones selecionados com garantia de verdade e conserto ágil sem enrolação. Cuidado de alto padrão com peças boas e preço justo.
+                    </p>
+                </div>
+
+                <!-- CTA Principal -->
+                <div class="pt-1">
+                    <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded transition-colors shadow-sm">
+                        Pedir Orçamento no WhatsApp
+                    </a>
+                </div>
+
+                <!-- VSL Player Portrait 9:16 com Proporção de Destaque -->
+                <div class="w-full max-w-[290px] sm:max-w-[330px] mx-auto pt-4 relative">
+                    <div class="relative aspect-[9/16] w-full rounded-lg overflow-hidden border border-brandBorder bg-black shadow-2xl flex items-center justify-center">
+                        <video id="vsl-video" class="w-full h-full object-cover cursor-pointer" poster="videos/video1_poster.webp" loop muted playsinline autoplay preload="metadata">
+                            <source src="videos/Video1.mp4" type="video/mp4">
+                            Seu navegador não suporta a reprodução de vídeos.
+                        </video>
+
+                        <button id="vsl-unmute-btn" aria-label="Ativar som" class="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/80 hover:bg-black text-white text-xs font-medium border border-white/20 transition-all backdrop-blur-sm">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                            </svg>
+                            <span>Ouvir com som</span>
+                        </button>
+
+                        <div id="vsl-play-indicator" class="absolute inset-0 z-20 flex items-center justify-center bg-black/30 opacity-0 pointer-events-none transition-opacity duration-300">
+                            <div class="w-12 h-12 rounded bg-black/80 flex items-center justify-center text-white border border-white/20">
+                                <svg class="w-6 h-6 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Sinais de Confiança Rápida -->
+                <div class="w-full max-w-4xl pt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
+                    <div class="p-3.5 rounded border border-brandBorder bg-brandCard/40 flex items-center gap-2.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-brandBlue shrink-0"></div>
+                        <span class="text-xs sm:text-sm font-medium text-neutral-200">Conserto rápido no mesmo dia</span>
+                    </div>
+                    <div class="p-3.5 rounded border border-brandBorder bg-brandCard/40 flex items-center gap-2.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-brandBlue shrink-0"></div>
+                        <span class="text-xs sm:text-sm font-medium text-neutral-200">Diagnóstico honesto e transparente</span>
+                    </div>
+                    <div class="p-3.5 rounded border border-brandBorder bg-brandCard/40 flex items-center gap-2.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-brandBlue shrink-0"></div>
+                        <span class="text-xs sm:text-sm font-medium text-neutral-200">iPhones 100% revisados e com garantia</span>
+                    </div>
+                    <div class="p-3.5 rounded border border-brandBorder bg-brandCard/40 flex items-center gap-2.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-brandBlue shrink-0"></div>
+                        <span class="text-xs sm:text-sm font-medium text-neutral-200">Peças e acessórios de primeira linha</span>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 BLOCO 2: ASSISTÊNCIA TÉCNICA (GRID MODULAR SPLIT)
+            =========================================== -->
+            <section id="assistencia" class="w-full text-left pt-12 border-t border-brandBorder scroll-mt-20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    
+                    <!-- Coluna da Esquerda: Narrativa & Box de Ação -->
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="space-y-3">
+                            <p class="text-xs uppercase tracking-widest text-brandBlue font-bold">Oficina e Manutenção</p>
+                            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-snug">
+                                Deu defeito no celular? A gente resolve rápido, com peça boa e total sinceridade.
+                            </h2>
+                        </div>
+
+                        <div class="space-y-4 text-neutral-300 text-sm sm:text-base leading-relaxed">
+                            <p>
+                                Caiu no chão e quebrou a tela? A bateria descarrega rápido demais, o conector não pega carga ou o aparelho caiu na água? A gente resolve com agilidade e cuidado em cada detalhe.
+                            </p>
+                            <p>
+                                Na Felipe Cell, a gente analisa o seu aparelho e explica o problema em palavras simples, mostrando a peça necessária e passando o valor certinho antes de começar. Sem empurrar conserto desnecessário e sem surpresa na hora de pagar. Se não compensar o conserto, a gente te avisa com total sinceridade.
+                            </p>
+                        </div>
+
+                        <!-- Card de Ação Rápida Assistência -->
+                        <div class="p-5 sm:p-6 rounded-lg border border-brandBorder bg-brandCard space-y-4">
+                            <p class="text-neutral-200 text-sm sm:text-base leading-relaxed">
+                                Mande uma foto ou vídeo do defeito pelo WhatsApp. A gente já te passa uma prévia do conserto e do tempo de entrega na hora.
+                            </p>
+                            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded transition-colors">
+                                Avaliar meu celular agora
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Coluna da Direita: Lista Curada de Serviços -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="pb-1">
+                            <h3 class="text-xs uppercase tracking-widest text-neutral-400 font-semibold">O que consertamos:</h3>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <div class="p-4 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 transition-colors hover:border-neutral-500">
+                                <div>
+                                    <span class="text-white font-semibold block text-base">Troca de tela e display</span>
+                                    <span class="text-neutral-400 text-xs sm:text-sm">Telas com toque perfeito, brilho vivo e alta durabilidade para seu aparelho parecer novo.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 transition-colors hover:border-neutral-500">
+                                <div>
+                                    <span class="text-white font-semibold block text-base">Bateria nova com carga duradoura</span>
+                                    <span class="text-neutral-400 text-xs sm:text-sm">Troque a bateria cansada e volte a passar o dia inteiro longe da tomada.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 transition-colors hover:border-neutral-500">
+                                <div>
+                                    <span class="text-white font-semibold block text-base">Entrada de carregador e botões</span>
+                                    <span class="text-neutral-400 text-xs sm:text-sm">Reparo ágil para o cabo encaixar firme e carregar com segurança.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 transition-colors hover:border-neutral-500">
+                                <div>
+                                    <span class="text-white font-semibold block text-base">Desoxidação de celular molhado</span>
+                                    <span class="text-neutral-400 text-xs sm:text-sm">Limpeza técnica profunda em laboratório para recuperar aparelhos que caíram na água.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 transition-colors hover:border-neutral-500">
+                                <div>
+                                    <span class="text-white font-semibold block text-base">Consertos gerais de placa e áudio</span>
+                                    <span class="text-neutral-400 text-xs sm:text-sm">Alto-falante mudo, microfone com ruído ou falhas no sistema resolvidos com precisão.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 BLOCO 3: LOJA — SMARTPHONES E ACESSÓRIOS (GRID MODULAR SPLIT INVERTIDO)
+            =========================================== -->
+            <section id="loja" class="w-full text-left pt-12 border-t border-brandBorder scroll-mt-20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    
+                    <!-- Coluna da Esquerda: Imagem de Destaque / Vitrine -->
+                    <div class="lg:col-span-5 order-2 lg:order-1 space-y-4">
+                        <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden">
+                            <div class="h-64 sm:h-72 lg:h-80 bg-black relative overflow-hidden">
+                                <img src="imgs/banner000.webp" alt="Vitrine de Smartphones e Acessórios Felipe Cell" class="w-full h-full object-cover">
+                                <div class="absolute top-3 left-3 px-2.5 py-1 rounded bg-black/80 backdrop-blur-sm border border-white/10 text-[11px] font-semibold uppercase tracking-wider text-neutral-300">
+                                    Aparelhos Testados & Aprovados
+                                </div>
+                            </div>
+                            <div class="p-4 bg-brandCard/90 border-t border-brandBorder">
+                                <p class="text-xs text-neutral-300 leading-relaxed">
+                                    Cada celular da nossa vitrine é inspecionado item por item para você comprar com 100% de segurança.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card de Ação Rápida da Loja -->
+                        <div class="p-5 sm:p-6 rounded-lg border border-brandBorder bg-brandCard space-y-4">
+                            <p class="text-neutral-200 text-sm sm:text-base leading-relaxed">
+                                Quer ver os modelos de iPhone e acessórios disponíveis hoje no estoque?
+                            </p>
+                            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded transition-colors">
+                                Ver catálogo e preços no WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Coluna da Direita: Narrativa & Itens da Loja -->
+                    <div class="lg:col-span-7 order-1 lg:order-2 space-y-6">
+                        <div class="space-y-3">
+                            <p class="text-xs uppercase tracking-widest text-brandBlue font-bold">Smartphones & Vitrine</p>
+                            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-snug">
+                                O iPhone dos seus sonhos com procedência garantida — e os melhores acessórios da cidade.
+                            </h2>
+                        </div>
+
+                        <div class="space-y-4 text-neutral-300 text-sm sm:text-base leading-relaxed">
+                            <p>
+                                Trabalhamos com smartphones novos e seminovos revisados com o máximo cuidado, com foco especial em iPhones: cada aparelho passa por rigorosos testes de qualidade e sai com garantia real de verdade.
+                            </p>
+                            <p>
+                                E pra completar, você encontra tudo no mesmo lugar: smartwatch, fone, capinha, película e carregador — sempre de procedência. Cabos e carregadores homologados que carregam com segurança e não viciam a bateria do seu celular.
+                            </p>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <h3 class="text-xs uppercase tracking-widest text-neutral-400 font-semibold">O que você encontra na loja:</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="p-3.5 rounded border border-brandBorder bg-brandCard flex items-start space-x-3 sm:col-span-2">
+                                    <span class="text-neutral-200 font-medium text-sm sm:text-base">Smartphones novos e seminovos revisados (com destaque especial para iPhone)</span>
+                                </div>
+                                <div class="p-3.5 rounded border border-brandBorder bg-brandCard flex items-start space-x-3">
+                                    <span class="text-neutral-200 font-medium text-sm sm:text-base">Smartwatches modernos</span>
+                                </div>
+                                <div class="p-3.5 rounded border border-brandBorder bg-brandCard flex items-start space-x-3">
+                                    <span class="text-neutral-200 font-medium text-sm sm:text-base">Fones bluetooth de alta fidelidade sonora</span>
+                                </div>
+                                <div class="p-3.5 rounded border border-brandBorder bg-brandCard flex items-start space-x-3">
+                                    <span class="text-neutral-200 font-medium text-sm sm:text-base">Capas anti-impacto e películas aplicadas na hora</span>
+                                </div>
+                                <div class="p-3.5 rounded border border-brandBorder bg-brandCard flex items-start space-x-3">
+                                    <span class="text-neutral-200 font-medium text-sm sm:text-base">Cabos e carregadores homologados</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 BLOCO 4: GALERIA E BASTIDORES (ESTILO ARQUIVO VISUAL EDITORIAL)
+            =========================================== -->
+            <section id="bastidores" class="w-full text-left pt-12 border-t border-brandBorder scroll-mt-20 space-y-8">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div class="space-y-2">
+                        <p class="text-xs uppercase tracking-widest text-brandBlue font-bold">Transparência e Cuidado</p>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+                            Como cuidamos do seu aparelho por dentro e por fora
+                        </h2>
+                    </div>
+                    <p class="text-xs uppercase tracking-widest text-neutral-400 font-medium">Bancada profissional em Porto do Mangue</p>
+                </div>
+
+                <!-- Grid de 4 Cards de Mídia com Legendas Estruturadas -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Card 1: Vídeo da bancada de conserto -->
+                    <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden flex flex-col transition-all hover:border-neutral-500">
+                        <div class="aspect-[4/3] bg-black relative overflow-hidden">
+                            <video class="w-full h-full object-cover" muted loop autoplay playsinline preload="metadata">
+                                <source src="videos/Video001.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brandBlue">Bancada Técnica</p>
+                            <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                                Ferramentas de alta precisão e cuidado minucioso com cada parafuso. O seu celular é tratado com o mesmo carinho que você tem por ele.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Foto dos iPhones sendo manuseados com cuidado -->
+                    <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden flex flex-col transition-all hover:border-neutral-500">
+                        <div class="aspect-[4/3] bg-black relative overflow-hidden">
+                            <img src="imgs/img002.jpg" alt="iPhones revisados com cuidado" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brandBlue">iPhones Selecionados</p>
+                            <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                                Sem riscos escondidos nem peças paralelas. Aparelhos limpos, 100% originais e prontos para uso.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Foto da vitrine, smartwatches e acessórios -->
+                    <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden flex flex-col transition-all hover:border-neutral-500">
+                        <div class="aspect-[4/3] bg-black relative overflow-hidden">
+                            <img src="imgs/banner000.webp" alt="Vitrine de smartwatches e acessórios" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brandBlue">Acessórios de Alto Padrão</p>
+                            <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                                Produtos escolhidos a dedo para proteger e dar mais estilo ao seu dia a dia, sempre com durabilidade garantida.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Imagem da cidade de Porto do Mangue -->
+                    <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden flex flex-col transition-all hover:border-neutral-500">
+                        <div class="aspect-[4/3] bg-black relative overflow-hidden">
+                            <img src="imgs/img001.jpg" alt="Loja física em Porto do Mangue" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-brandBlue">Porto do Mangue</p>
+                            <p class="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                                Gente da terra cuidando de você e de quem vem de toda a região. Você sabe onde nos encontrar, com a certeza de um atendimento de confiança.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Showcase de Vídeos Inclinado Integrado -->
+                <div class="w-full pt-4">
+                    <section id="showcase-section" class="w-full sessao-galeria">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-brandDark to-transparent z-20"></div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-brandDark to-transparent z-20"></div>
+
+                        <div class="container-inclinado">
+                            <div id="trilha-esquerda" class="trilha esquerda"></div>
+                            <div id="trilha-direita" class="trilha direita"></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 BLOCO 5: 3 MOTIVOS PARA ESCOLHER A FELIPE CELL (PILARES NUMERADOS)
+            =========================================== -->
+            <section id="diferenciais" class="w-full text-left pt-12 border-t border-brandBorder scroll-mt-20 space-y-8">
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <p class="text-xs uppercase tracking-widest text-brandBlue font-bold">Por que a Felipe Cell?</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+                        3 Certezas que você só tem ao escolher a Felipe Cell
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Motivo 1 -->
+                    <div class="p-6 sm:p-8 rounded-lg border border-brandBorder bg-brandCard space-y-4 transition-all hover:border-neutral-500">
+                        <div class="text-base font-bold text-brandBlue uppercase tracking-widest">01</div>
+                        <h3 class="text-xl font-bold text-white">Rapidez sem enrolação</h3>
+                        <p class="text-sm text-neutral-300 leading-relaxed">
+                            A maior parte dos consertos fica pronta no mesmo dia. Nada de passar dias esperando para resolver o que é simples.
+                        </p>
+                    </div>
+
+                    <!-- Motivo 2 -->
+                    <div class="p-6 sm:p-8 rounded-lg border border-brandBorder bg-brandCard space-y-4 transition-all hover:border-neutral-500">
+                        <div class="text-base font-bold text-brandBlue uppercase tracking-widest">02</div>
+                        <h3 class="text-xl font-bold text-white">Peças de procedência garantida</h3>
+                        <p class="text-sm text-neutral-300 leading-relaxed">
+                            Trabalhamos apenas com peças testadas e duráveis. Nada de gambiarras que funcionam hoje e pifam amanhã. Seu celular sai funcionando de verdade.
+                        </p>
+                    </div>
+
+                    <!-- Motivo 3 -->
+                    <div class="p-6 sm:p-8 rounded-lg border border-brandBorder bg-brandCard space-y-4 transition-all hover:border-neutral-500">
+                        <div class="text-base font-bold text-brandBlue uppercase tracking-widest">03</div>
+                        <h3 class="text-xl font-bold text-white">Conversa clara e direta</h3>
+                        <p class="text-sm text-neutral-300 leading-relaxed">
+                            Você fala direto com quem resolve seu aparelho. Explicamos tudo com clareza e respeito, sem letrinhas miúdas.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 BLOCO 6: CONTATO / ONDE ESTAMOS (DIVISÃO CONCIERGE)
+            =========================================== -->
+            <section id="contato" class="w-full text-left pt-12 border-t border-brandBorder scroll-mt-20 space-y-8">
+                <div class="space-y-2">
+                    <p class="text-xs uppercase tracking-widest text-brandBlue font-bold">Venha nos Visitar</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+                        Estamos bem perto de você em Porto do Mangue
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Informações de Localização e Horário -->
+                    <div class="p-6 sm:p-8 rounded-lg border border-brandBorder bg-brandCard space-y-6">
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Endereço</h3>
+                            <p class="text-base text-neutral-200 font-medium">
+                                Loja física no Centro de Porto do Mangue (Fácil acesso)
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-brandBorder/60">
+                            <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Horário de funcionamento</h3>
+                            <p class="text-base text-neutral-200 font-medium">
+                                Segunda a Sexta: das 08h às 12h e das 14h às 18h<br>
+                                Sábado: das 08h às 12h
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bloco Fale com a Gente -->
+                    <div class="p-6 sm:p-8 rounded-lg border border-brandBorder bg-brandCard flex flex-col justify-between space-y-6">
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Fale com a gente</h3>
+                            <p class="text-sm sm:text-base text-neutral-300 leading-relaxed">
+                                Tire dúvidas, solicite orçamentos rápidos e confira os aparelhos disponíveis direto com nossa equipe no WhatsApp.
+                            </p>
+                        </div>
+
+                        <div>
+                            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full px-6 py-3.5 text-base font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded transition-colors text-center shadow-sm">
+                                Falar com a Felipe Cell no WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- RODAPÉ DA PÁGINA COM ASSINATURA EDITORIAL -->
+        <footer class="w-full py-10 border-t border-brandBorder bg-brandDark">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+                
+                <div class="space-y-1">
+                    <p class="text-xs text-neutral-400">© 2026 Felipe Cell • Porto do Mangue. Todos os direitos reservados.</p>
+                    <p class="text-[11px] text-neutral-500">iPhones revisados, acessórios e consertos especializados.</p>
+                </div>
+                
+                <!-- Redes Sociais com Tooltips -->
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-md border border-brandBorder bg-brandCard">
+                    <!-- WHATSAPP -->
+                    <a 
+                        href="https://wa.me/5584987198381" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        aria-label="WhatsApp"
+                        class="social-link group relative flex items-center justify-center w-9 h-9 rounded transition-colors"
+                    >
+                        <span class="hover-bg absolute inset-0 rounded bg-white/10 opacity-0 scale-90 transition-all"></span>
+                        <span class="icon-wrapper relative z-10 text-neutral-400 group-hover:text-white transition-colors">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                            </svg>
+                        </span>
+                        <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white text-neutral-900 text-[10px] font-medium whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all">
+                            WhatsApp
+                        </span>
+                    </a>
+
+                    <!-- INSTAGRAM -->
+                    <a 
+                        href="https://instagram.com/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        aria-label="Instagram"
+                        class="social-link group relative flex items-center justify-center w-9 h-9 rounded transition-colors"
+                    >
+                        <span class="hover-bg absolute inset-0 rounded bg-white/10 opacity-0 scale-90 transition-all"></span>
+                        <span class="icon-wrapper relative z-10 text-neutral-400 group-hover:text-white transition-colors">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.395a1.44 1.44 0 100-2.88 1.44 1.44 0 000 2.88z" />
+                            </svg>
+                        </span>
+                        <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white text-neutral-900 text-[10px] font-medium whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all">
+                            Instagram
+                        </span>
+                    </a>
+                </div>
+
+            </div>
+        </footer>
+    </div>
+
+    <!-- SCRIPTS INTEGRADOS -->
+    <script>
+        function renderCardHTML(videoName) {
+            const posterAttr = videoName === 'Video1.mp4' ? 'poster="videos/video1_poster.webp"' : '';
+            return `
+                <div class="showcase-card">
+                    <video class="absolute inset-0 w-full h-full object-cover" ${posterAttr} loop muted playsinline preload="metadata">
+                        <source src="videos/${videoName}" type="video/mp4">
+                    </video>
+                </div>
+            `;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Inicialização da galeria inclinada
+            const trilhaEsquerda = document.getElementById("trilha-esquerda");
+            const trilhaDireita = document.getElementById("trilha-direita");
+
+            if (trilhaEsquerda && trilhaDireita) {
+                trilhaEsquerda.style.animation = "none";
+                trilhaDireita.style.animation = "none";
+                trilhaEsquerda.style.position = "relative";
+                trilhaDireita.style.position = "relative";
+                trilhaEsquerda.style.width = "100%";
+                trilhaDireita.style.width = "100%";
+
+                function getCardMetrics() {
+                    const isMobile = window.innerWidth <= 768;
+                    const cardWidth = isMobile ? 190 : 270;
+                    const gap = isMobile ? 13.6 : 20;
+                    return { cardWidth, gap, step: cardWidth + gap };
+                }
+
+                const screenWidthMax = window.screen.width || 1920;
+                const metricsInit = getCardMetrics();
+                const numCards = Math.ceil((screenWidthMax * 1.3) / metricsInit.step) + 2;
+
+                const videoSources = ["Video1.mp4", "Video001.mp4", "Video002.mp4", "video003.mp4", "video004.mp4"];
+
+                const htmlTrilhaEsquerda = Array(numCards).fill(null).map((_, index) => {
+                    const videoName = videoSources[index % videoSources.length];
+                    return renderCardHTML(videoName);
+                }).join('');
+
+                const htmlTrilhaDireita = Array(numCards).fill(null).map((_, index) => {
+                    const videoName = videoSources[(index + 2) % videoSources.length];
+                    return renderCardHTML(videoName);
+                }).join('');
+
+                trilhaEsquerda.innerHTML = htmlTrilhaEsquerda;
+                trilhaDireita.innerHTML = htmlTrilhaDireita;
+
+                const cardsEsquerda = Array.from(trilhaEsquerda.querySelectorAll(".showcase-card"));
+                const cardsDireita = Array.from(trilhaDireita.querySelectorAll(".showcase-card"));
+
+                [...cardsEsquerda, ...cardsDireita].forEach(card => {
+                    card.style.position = "absolute";
+                    card.style.left = "0";
+                    card.style.top = "0";
+                });
+
+                let metrics = getCardMetrics();
+                let xEsquerda = cardsEsquerda.map((_, i) => i * metrics.step);
+                let xDireita = cardsDireita.map((_, i) => i * metrics.step);
+
+                const allCards = [...cardsEsquerda, ...cardsDireita];
+                allCards.forEach(card => {
+                    const video = card.querySelector("video");
+                    if (video) {
+                        card.addEventListener("mouseenter", () => {
+                            allCards.forEach(otherCard => {
+                                const otherVideo = otherCard.querySelector("video");
+                                if (otherVideo && otherVideo !== video) {
+                                    otherVideo.pause();
+                                }
+                            });
+                            video.play().catch(error => {
+                                console.log("Autoplay ao passar o mouse bloqueado:", error);
+                            });
+                        });
+
+                        card.addEventListener("mouseleave", () => {
+                            video.pause();
+                        });
+                    }
+                });
+
+                const speed = 0.55; 
+
+                window.addEventListener("resize", () => {
+                    metrics = getCardMetrics();
+                });
+
+                function animate() {
+                    const containerWidth = trilhaEsquerda.offsetWidth || window.innerWidth;
+
+                    for (let i = 0; i < cardsEsquerda.length; i++) {
+                        xEsquerda[i] -= speed;
+                        if (xEsquerda[i] < -metrics.cardWidth) {
+                            const maxX = Math.max(...xEsquerda);
+                            xEsquerda[i] = maxX + metrics.step;
+                        }
+                        cardsEsquerda[i].style.transform = `translateX(${xEsquerda[i]}px)`;
+                    }
+
+                    for (let i = 0; i < cardsDireita.length; i++) {
+                        xDireita[i] += speed;
+                        const limitRight = containerWidth + metrics.cardWidth;
+                        if (xDireita[i] > limitRight) {
+                            const minX = Math.min(...xDireita);
+                            xDireita[i] = minX - metrics.step;
+                        }
+                        cardsDireita[i].style.transform = `translateX(${xDireita[i]}px)`;
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            // Controle do VSL
+            const vslVideo = document.getElementById("vsl-video");
+            const vslUnmuteBtn = document.getElementById("vsl-unmute-btn");
+            const vslPlayIndicator = document.getElementById("vsl-play-indicator");
+
+            if (vslVideo && vslUnmuteBtn) {
+                vslUnmuteBtn.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    vslVideo.muted = false;
+                    vslVideo.currentTime = 0;
+                    vslVideo.play().catch(err => console.log("Erro áudio:", err));
+                    vslUnmuteBtn.style.display = "none";
+                });
+
+                vslVideo.addEventListener("click", function () {
+                    if (vslVideo.paused) {
+                        vslVideo.play();
+                        if (vslPlayIndicator) vslPlayIndicator.style.opacity = "0";
+                    } else {
+                        vslVideo.pause();
+                        if (vslPlayIndicator) vslPlayIndicator.style.opacity = "1";
+                    }
+                });
+            }
+
+            // Loader
+            const loaderScreen = document.getElementById("loader-screen");
+            const mainContent = document.getElementById("main-content");
+            const progressBar = document.getElementById("progress-bar");
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 15) + 12;
+                if (progress > 100) progress = 100;
+                
+                if (progressBar) progressBar.style.width = progress + "%";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if (loaderScreen) {
+                            loaderScreen.style.opacity = "0";
+                            loaderScreen.style.pointerEvents = "none";
+                        }
+                        document.body.classList.remove("loader-active");
+                        if (mainContent) mainContent.style.opacity = "1";
+                    }, 300);
+                }
+            }, 120);
+        });
+    </script>
+</body>
+</html>

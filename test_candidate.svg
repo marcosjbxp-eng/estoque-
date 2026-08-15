@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 411 289" width="411" height="289" style="background-color: #000000;">
+
+  <!-- Map Folded Outlines -->
+  <g fill="none" stroke="#212324" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer perimeter and folds -->
+    <!-- Left panel: (118, 128) -> (170, 100) -> (170, 180) -> (118, 208) -> z -->
+    <path d="M 118 128 L 170 100 L 236 128 L 308 100 V 180 L 236 208 L 170 180 L 118 208 Z" />
+    <!-- Vertical fold lines inside -->
+    <path d="M 170 100 V 180" />
+    <path d="M 236 128 V 208" />
+  </g>
+
+  <!-- Dashed Route Line -->
+  <g fill="none" stroke="#0841FA" stroke-width="10" stroke-linecap="round">
+    <path d="M 148 186 Q 165 168 185 168" />
+    <path d="M 212 170 Q 235 180 250 178" />
+    <path d="M 270 168 Q 280 155 285 145" stroke-dasharray="0 0" />
+  </g>
+
+  <!-- Location Pin -->
+  <g fill="none" stroke="#0841FA" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Location Pin Teardrop Body -->
+    <path d="M 285 145 C 260 115 255 75 285 65 C 315 75 310 115 285 145 Z" />
+    <!-- Location Pin Dot -->
+    <circle cx="285" cy="90" r="8" fill="#0841FA" stroke="none" />
+  </g>
+</svg>
