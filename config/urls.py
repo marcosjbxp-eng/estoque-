@@ -5,18 +5,29 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 from django.views.static import serve
+from django.views.decorators.cache import cache_page
+
+# Cache por 1 hora (3600 segundos) para tornar o carregamento mais liso nas próximas visitas
+cache_time = 60 * 60
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('vendas/', TemplateView.as_view(template_name='index.html'), name='pagina_vendas'),
-    path('pagina-vendas/', TemplateView.as_view(template_name='index.html'), name='pagina_vendas_alt'),
-    path('videos/<path:path>', serve, {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
-    path('vendas/videos/<path:path>', serve, {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
-    path('imgs/<path:path>', serve, {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
-    path('vendas/imgs/<path:path>', serve, {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
-    path('', include('estoque.urls')),
+    
+    # Rota primordial: Página de vendas como '/'
+    path('', cache_page(cache_time)(TemplateView.as_view(template_name='index.html')), name='pagina_vendas_principal'),
+    path('vendas/', cache_page(cache_time)(TemplateView.as_view(template_name='index.html')), name='pagina_vendas'),
+    path('pagina-vendas/', cache_page(cache_time)(TemplateView.as_view(template_name='index.html')), name='pagina_vendas_alt'),
+    
+    # Recursos estáticos da página de vendas (cacheados)
+    path('videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
+    path('vendas/videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
+    path('imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
+    path('vendas/imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
+    
+    # Sistema movido para /sistema/
+    path('sistema/', include('estoque.urls')),
 ]
 
 if settings.DEBUG:

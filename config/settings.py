@@ -72,6 +72,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Configuração de Cache para melhoria de performance (Site rodar mais liso nas próximas visitas)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 # Configuração de Banco de Dados
 # Prioridade: DATABASE_URL (Vercel/Neon) > MySQL > SQLite (local dev)
 DATABASE_URL = os.getenv('DATABASE_URL', '')
