@@ -16,3 +16,6 @@ staticfiles/
 .idea/
 .DS_Store
 desktop.ini
+
+.vercel
+.env*

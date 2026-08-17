@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Felipe Cell | Loja de Celulares e Assistência Técnica em Porto do Mangue</title>
     <meta name="description" content="iPhones selecionados com garantia, acessórios de primeira linha e conserto rápido pro seu celular em Porto do Mangue. Agilidade, honestidade e peças de procedência.">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -202,23 +203,26 @@
 
                 <!-- VSL Player Portrait 9:16 com Proporção de Destaque -->
                 <div class="w-full max-w-[290px] sm:max-w-[330px] mx-auto pt-4 relative">
-                    <div class="relative aspect-[9/16] w-full rounded-lg overflow-hidden border border-brandBorder bg-black shadow-2xl flex items-center justify-center">
-                        <video id="vsl-video" class="w-full h-full object-cover cursor-pointer" poster="videos/video1_poster.webp" loop muted playsinline autoplay preload="metadata">
+                    <div class="relative aspect-[9/16] w-full rounded-lg overflow-hidden border border-brandBorder bg-black shadow-2xl flex items-center justify-center cursor-pointer" id="vsl-container">
+                        <video id="vsl-video-player" class="w-full h-full object-cover pointer-events-none" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback>
                             <source src="videos/Video1.mp4" type="video/mp4">
-                            Seu navegador não suporta a reprodução de vídeos.
                         </video>
+                        <div id="vsl-overlay" class="absolute inset-0 z-20"></div>
 
-                        <button id="vsl-unmute-btn" aria-label="Ativar som" class="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded bg-black/80 hover:bg-black text-white text-xs font-medium border border-white/20 transition-all backdrop-blur-sm">
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                        <!-- Botão de Som (SoundToggleSquare style) -->
+                        <button id="vsl-unmute-btn" type="button" aria-label="Ativar som do vídeo" title="Ouvir com som" class="absolute top-3 right-3 z-30 inline-flex items-center gap-2 h-8 px-3 rounded-md bg-zinc-900 text-zinc-100 border border-zinc-800 hover:bg-zinc-800/80 hover:border-zinc-700 hover:text-zinc-50 active:scale-[0.98] transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 cursor-pointer select-none">
+                            <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-300 transition-colors" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a2 2 0 0 0-3.54-1.3L7.8 6H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h3.8l2.2 2.2"></path>
                             </svg>
-                            <span>Ouvir com som</span>
+                            <span class="text-xs font-medium tracking-tight text-zinc-200">Ouvir com som</span>
                         </button>
 
-                        <div id="vsl-play-indicator" class="absolute inset-0 z-20 flex items-center justify-center bg-black/30 opacity-0 pointer-events-none transition-opacity duration-300">
-                            <div class="w-12 h-12 rounded bg-black/80 flex items-center justify-center text-white border border-white/20">
-                                <svg class="w-6 h-6 fill-current translate-x-0.5" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z"/>
+                        <!-- Indicador/Botão Play/Pause (PlayPauseSquare style) -->
+                        <div id="vsl-play-indicator" class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 opacity-0 pointer-events-none transition-opacity duration-200">
+                            <div class="inline-flex items-center justify-center h-10 w-10 rounded-md bg-zinc-900 text-zinc-100 border border-zinc-800 shadow-xl">
+                                <svg class="w-5 h-5 text-zinc-300 fill-zinc-300 translate-x-[0.5px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                 </svg>
                             </div>
                         </div>
@@ -427,9 +431,7 @@
                     <!-- Card 1: Vídeo da bancada de conserto -->
                     <div class="rounded-lg border border-brandBorder bg-brandCard overflow-hidden flex flex-col transition-all hover:border-neutral-500">
                         <div class="aspect-[4/3] bg-black relative overflow-hidden">
-                            <video class="w-full h-full object-cover" muted loop autoplay playsinline preload="metadata">
-                                <source src="videos/Video001.mp4" type="video/mp4">
-                            </video>
+                            <video src="https://ckihchxxhq0ymkfb.public.blob.vercel-storage.com/Video001.mp4" class="w-full h-full object-cover pointer-events-none border-0" autoplay muted loop playsinline webkit-playsinline preload="metadata" disablepictureinpicture disableremoteplayback></video>
                         </div>
                         <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
                             <p class="text-[11px] font-bold uppercase tracking-wider text-brandBlue">Bancada Técnica</p>
@@ -579,9 +581,15 @@
                             </p>
                         </div>
 
-                        <div>
-                            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full px-6 py-3.5 text-base font-semibold text-white bg-brandBlue hover:bg-brandBlueHover rounded transition-colors text-center shadow-sm">
-                                Falar com a Felipe Cell no WhatsApp
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center flex-1 px-5 py-3 text-sm font-semibold text-white bg-brandBlue hover:bg-brandBlueHover transition-colors text-center">
+                                WhatsApp
+                            </a>
+                            <a href="https://www.instagram.com/cell_felipe/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-neutral-200 bg-brandDark hover:bg-neutral-800 border border-brandBorder transition-colors text-center">
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-neutral-300">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.395a1.44 1.44 0 100-2.88 1.44 1.44 0 000 2.88z" />
+                                </svg>
+                                <span>@cell_felipe</span>
                             </a>
                         </div>
                     </div>
@@ -623,20 +631,19 @@
 
                     <!-- INSTAGRAM -->
                     <a 
-                        href="https://instagram.com/" 
+                        href="https://www.instagram.com/cell_felipe/" 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        aria-label="Instagram"
-                        class="social-link group relative flex items-center justify-center w-9 h-9 rounded transition-colors"
+                        aria-label="Instagram @cell_felipe"
+                        class="social-link group relative flex items-center justify-center w-9 h-9 border border-transparent hover:border-brandBorder hover:bg-white/5 transition-colors"
                     >
-                        <span class="hover-bg absolute inset-0 rounded bg-white/10 opacity-0 scale-90 transition-all"></span>
                         <span class="icon-wrapper relative z-10 text-neutral-400 group-hover:text-white transition-colors">
                             <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.395a1.44 1.44 0 100-2.88 1.44 1.44 0 000 2.88z" />
                             </svg>
                         </span>
-                        <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white text-neutral-900 text-[10px] font-medium whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all">
-                            Instagram
+                        <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 border border-brandBorder bg-brandDark text-neutral-200 text-[10px] font-medium whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all">
+                            @cell_felipe
                         </span>
                     </a>
                 </div>
@@ -646,13 +653,16 @@
     </div>
 
     <!-- SCRIPTS INTEGRADOS -->
+    <!-- SCRIPTS INTEGRADOS COM VÍDEOS LOCAIS OTIMIZADOS -->
     <script>
-        function renderCardHTML(videoName) {
-            const posterAttr = videoName === 'Video1.mp4' ? 'poster="videos/video1_poster.webp"' : '';
+        function renderCardHTML(videoUrl) {
             return `
-                <div class="showcase-card">
-                    <video class="absolute inset-0 w-full h-full object-cover" ${posterAttr} loop muted playsinline preload="metadata">
-                        <source src="videos/${videoName}" type="video/mp4">
+                <div class="showcase-card overflow-hidden relative">
+                    <video class="showcase-video absolute inset-0 w-full h-full object-cover pointer-events-none" 
+                        src="${videoUrl}" 
+                        muted loop playsinline webkit-playsinline 
+                        preload="metadata" 
+                        disablepictureinpicture disableremoteplayback>
                     </video>
                 </div>
             `;
@@ -678,20 +688,28 @@
                     return { cardWidth, gap, step: cardWidth + gap };
                 }
 
+                const checkMobile = () => window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
                 const screenWidthMax = window.screen.width || 1920;
                 const metricsInit = getCardMetrics();
                 const numCards = Math.ceil((screenWidthMax * 1.3) / metricsInit.step) + 2;
 
-                const videoSources = ["Video1.mp4", "Video001.mp4", "Video002.mp4", "video003.mp4", "video004.mp4"];
+                const videoSources = [
+                    "videos/Video1.mp4",
+                    "https://ckihchxxhq0ymkfb.public.blob.vercel-storage.com/Video001.mp4",
+                    "https://ckihchxxhq0ymkfb.public.blob.vercel-storage.com/Video002.mp4",
+                    "https://ckihchxxhq0ymkfb.public.blob.vercel-storage.com/video003.mp4",
+                    "https://ckihchxxhq0ymkfb.public.blob.vercel-storage.com/video004.mp4"
+                ];
 
                 const htmlTrilhaEsquerda = Array(numCards).fill(null).map((_, index) => {
-                    const videoName = videoSources[index % videoSources.length];
-                    return renderCardHTML(videoName);
+                    const videoUrl = videoSources[index % videoSources.length];
+                    return renderCardHTML(videoUrl);
                 }).join('');
 
                 const htmlTrilhaDireita = Array(numCards).fill(null).map((_, index) => {
-                    const videoName = videoSources[(index + 2) % videoSources.length];
-                    return renderCardHTML(videoName);
+                    const videoUrl = videoSources[(index + 2) % videoSources.length];
+                    return renderCardHTML(videoUrl);
                 }).join('');
 
                 trilhaEsquerda.innerHTML = htmlTrilhaEsquerda;
@@ -700,37 +718,31 @@
                 const cardsEsquerda = Array.from(trilhaEsquerda.querySelectorAll(".showcase-card"));
                 const cardsDireita = Array.from(trilhaDireita.querySelectorAll(".showcase-card"));
 
-                [...cardsEsquerda, ...cardsDireita].forEach(card => {
+                const allCards = [...cardsEsquerda, ...cardsDireita];
+
+                allCards.forEach(card => {
                     card.style.position = "absolute";
                     card.style.left = "0";
                     card.style.top = "0";
+
+                    const video = card.querySelector("video");
+                    if (video) {
+                        card.addEventListener("mouseenter", () => {
+                            if (!checkMobile()) {
+                                video.play().catch(() => {});
+                            }
+                        });
+                        card.addEventListener("mouseleave", () => {
+                            if (!checkMobile()) {
+                                video.pause();
+                            }
+                        });
+                    }
                 });
 
                 let metrics = getCardMetrics();
                 let xEsquerda = cardsEsquerda.map((_, i) => i * metrics.step);
                 let xDireita = cardsDireita.map((_, i) => i * metrics.step);
-
-                const allCards = [...cardsEsquerda, ...cardsDireita];
-                allCards.forEach(card => {
-                    const video = card.querySelector("video");
-                    if (video) {
-                        card.addEventListener("mouseenter", () => {
-                            allCards.forEach(otherCard => {
-                                const otherVideo = otherCard.querySelector("video");
-                                if (otherVideo && otherVideo !== video) {
-                                    otherVideo.pause();
-                                }
-                            });
-                            video.play().catch(error => {
-                                console.log("Autoplay ao passar o mouse bloqueado:", error);
-                            });
-                        });
-
-                        card.addEventListener("mouseleave", () => {
-                            video.pause();
-                        });
-                    }
-                });
 
                 const speed = 0.55; 
 
@@ -764,25 +776,52 @@
                 }
 
                 requestAnimationFrame(animate);
+
+                // Otimização de Performance e Controle Responsivo
+                if ('IntersectionObserver' in window) {
+                    const videoObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            const video = entry.target;
+                            const isMobile = checkMobile();
+
+                            if (entry.isIntersecting) {
+                                // No mobile os vídeos rodam automaticamente ao aparecer na tela
+                                if (isMobile && video.paused) {
+                                    video.play().catch(() => {});
+                                }
+                            } else {
+                                // Se sair da tela, pausa o vídeo (tanto em PC quanto Mobile)
+                                if (!video.paused) video.pause();
+                            }
+                        });
+                    }, { threshold: 0.1 });
+
+                    document.querySelectorAll('.showcase-video').forEach(video => {
+                        videoObserver.observe(video);
+                    });
+                }
             }
 
-            // Controle do VSL
-            const vslVideo = document.getElementById("vsl-video");
+            // Controle do VSL Nativo
+            const vslVideo = document.getElementById("vsl-video-player");
             const vslUnmuteBtn = document.getElementById("vsl-unmute-btn");
+            const vslOverlay = document.getElementById("vsl-overlay");
             const vslPlayIndicator = document.getElementById("vsl-play-indicator");
 
-            if (vslVideo && vslUnmuteBtn) {
+            if (vslUnmuteBtn && vslVideo) {
                 vslUnmuteBtn.addEventListener("click", function (e) {
                     e.stopPropagation();
                     vslVideo.muted = false;
                     vslVideo.currentTime = 0;
-                    vslVideo.play().catch(err => console.log("Erro áudio:", err));
+                    vslVideo.play().catch(() => {});
                     vslUnmuteBtn.style.display = "none";
                 });
+            }
 
-                vslVideo.addEventListener("click", function () {
+            if (vslOverlay && vslVideo) {
+                vslOverlay.addEventListener("click", function () {
                     if (vslVideo.paused) {
-                        vslVideo.play();
+                        vslVideo.play().catch(() => {});
                         if (vslPlayIndicator) vslPlayIndicator.style.opacity = "0";
                     } else {
                         vslVideo.pause();
