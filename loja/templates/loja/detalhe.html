@@ -35,7 +35,7 @@
                                 controls 
                                 playsinline 
                                 preload="metadata"
-                                class="w-full h-full object-contain bg-black"
+                                class="w-full h-full object-cover"
                             >
                                 <source src="{{ produto.video_url_optimized }}" type="video/mp4">
                                 <source src="{{ produto.video_url_optimized }}" type="video/quicktime">
@@ -46,11 +46,11 @@
 
                         <!-- 2. Foto Principal -->
                         {% if produto.foto_principal %}
-                        <div class="galeria-slide w-full h-full shrink-0 snap-center flex items-center justify-center relative bg-[#161719]" data-tipo="foto">
+                        <div class="galeria-slide w-full h-full shrink-0 snap-center flex items-center justify-center relative bg-[#161719] aspect-square" data-tipo="foto">
                             <img 
                                 src="{{ produto.foto_principal.url }}" 
                                 alt="{{ produto.nome }}" 
-                                class="w-full h-full object-contain pointer-events-none"
+                                class="w-full h-full object-cover pointer-events-none"
                                 loading="eager"
                             >
                         </div>
@@ -58,11 +58,11 @@
 
                         <!-- 3. Fotos Secundárias -->
                         {% for foto_sec in fotos_secundarias %}
-                        <div class="galeria-slide w-full h-full shrink-0 snap-center flex items-center justify-center relative bg-[#161719]" data-tipo="foto">
+                        <div class="galeria-slide w-full h-full shrink-0 snap-center flex items-center justify-center relative bg-[#161719] aspect-square" data-tipo="foto">
                             <img 
                                 src="{{ foto_sec.foto.url }}" 
                                 alt="{{ produto.nome }} - Foto {{ forloop.counter }}" 
-                                class="w-full h-full object-contain pointer-events-none"
+                                class="w-full h-full object-cover pointer-events-none"
                                 loading="lazy"
                             >
                         </div>
@@ -281,9 +281,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {% for rel in produtos_relacionados %}
             <article class="bg-[#111214] border border-neutral-800/90 hover:border-neutral-700 rounded-xl overflow-hidden flex flex-col group transition-all duration-200 hover:-translate-y-0.5">
-                <a href="{{ rel.get_absolute_url }}" class="block aspect-square bg-[#161719] p-3 overflow-hidden">
+                <a href="{{ rel.get_absolute_url }}" class="block aspect-square bg-[#161719] overflow-hidden">
                     {% if rel.foto_principal %}
-                        <img src="{{ rel.foto_principal.url }}" alt="{{ rel.nome }}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200">
+                        <img src="{{ rel.foto_principal.url }}" alt="{{ rel.nome }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                     {% else %}
                         <div class="w-full h-full flex items-center justify-center text-neutral-600 text-xs">Sem foto</div>
                     {% endif %}
