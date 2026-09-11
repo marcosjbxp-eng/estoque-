@@ -77,6 +77,25 @@
                 {% if form.preco_venda_unitario.errors %}<div class="text-danger small mt-1">{{ form.preco_venda_unitario.errors.0 }}</div>{% endif %}
             </div>
 
+            <!-- Forma de Pagamento (Aparece dinamicamente na Saída) -->
+            <div class="mb-4 d-none" id="div_forma_pagamento">
+                <label class="form-label" for="{{ form.forma_pagamento.id_for_label }}">
+                    Forma de Pagamento <span class="text-danger">*</span>
+                </label>
+                {{ form.forma_pagamento }}
+                {% if form.forma_pagamento.errors %}<div class="text-danger small mt-1">{{ form.forma_pagamento.errors.0 }}</div>{% endif %}
+            </div>
+
+            <!-- Parcelas (Aparece dinamicamente quando Cartão Crédito) -->
+            <div class="mb-4 d-none" id="div_parcelas">
+                <label class="form-label" for="{{ form.parcelas.id_for_label }}">
+                    Número de Parcelas <span class="text-danger">*</span>
+                </label>
+                {{ form.parcelas }}
+                <small class="text-muted d-block mt-1">Quantidade de parcelas no cartão de crédito (1 = à vista no crédito).</small>
+                {% if form.parcelas.errors %}<div class="text-danger small mt-1">{{ form.parcelas.errors.0 }}</div>{% endif %}
+            </div>
+
             <!-- Card com Cálculo em Tempo Real do Lucro -->
             <div class="p-3 mb-4 rounded-3 bg-dark bg-opacity-75 border border-success border-opacity-25 d-none" id="card_lucro_estimado">
                 <div class="d-flex align-items-center justify-content-between">
@@ -113,17 +132,32 @@
         const inputQtd = document.getElementById('id_quantidade');
         const cardLucro = document.getElementById('card_lucro_estimado');
         const valLucro = document.getElementById('val_lucro_estimado');
+        const divFormaPgto = document.getElementById('div_forma_pagamento');
+        const selectFormaPgto = document.getElementById('id_forma_pagamento');
+        const divParcelas = document.getElementById('div_parcelas');
 
         const precoCusto = parseFloat('{{ produto.preco_custo|stringformat:".2f" }}') || 0;
 
         function atualizarInterface() {
             if (selectTipo.value === 'SAIDA') {
                 divPrecoVenda.classList.remove('d-none');
+                divFormaPgto.classList.remove('d-none');
                 cardLucro.classList.remove('d-none');
+                atualizarParcelas();
                 calcularLucro();
             } else {
                 divPrecoVenda.classList.add('d-none');
+                divFormaPgto.classList.add('d-none');
+                divParcelas.classList.add('d-none');
                 cardLucro.classList.add('d-none');
+            }
+        }
+
+        function atualizarParcelas() {
+            if (selectFormaPgto.value === 'CARTAO_CREDITO') {
+                divParcelas.classList.remove('d-none');
+            } else {
+                divParcelas.classList.add('d-none');
             }
         }
 
@@ -139,6 +173,7 @@
         }
 
         selectTipo.addEventListener('change', atualizarInterface);
+        selectFormaPgto.addEventListener('change', atualizarParcelas);
         inputPrecoVenda.addEventListener('input', calcularLucro);
         inputQtd.addEventListener('input', calcularLucro);
 

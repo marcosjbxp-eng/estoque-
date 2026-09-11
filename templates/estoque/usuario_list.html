@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestão de Usuários — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h2 class="fw-bold text-white mb-1">
+            <i class="bi bi-people text-primary me-2"></i>Gestão de Usuários
+        </h2>
+        <p class="text-muted mb-0">Crie, edite e gerencie os acessos ao sistema.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'estoque:usuario_create' %}" class="btn btn-primary-custom">
+            <i class="bi bi-person-plus me-1"></i> Novo Usuário
+        </a>
+    </div>
+</div>
+
+{% if usuarios %}
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Nome Completo</th>
+                    <th>E-mail</th>
+                    <th>Papel</th>
+                    <th>Lojas Vinculadas</th>
+                    <th>Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr class="{% if not u.is_active %}opacity-50{% endif %}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-primary bg-opacity-25 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="bi bi-person text-primary"></i>
+                            </div>
+                            <span class="fw-bold text-white">{{ u.username }}</span>
+                        </div>
+                    </td>
+                    <td class="text-light">{{ u.get_full_name|default:"—" }}</td>
+                    <td class="text-muted small">{{ u.email|default:"—" }}</td>
+                    <td>
+                        {% if u.is_superuser or u.groups.all|length > 0 %}
+                            <span class="badge" style="background-color: rgba(30, 97, 232, 0.2); color: #60a5fa; border: 1px solid rgba(30, 97, 232, 0.3);">
+                                <i class="bi bi-shield-check me-1"></i>Admin Master
+                            </span>
+                        {% else %}
+                            <span class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                <i class="bi bi-person me-1"></i>Afiliado
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% for loja in u.lojas.all %}
+                            <span class="badge badge-sku me-1" style="font-size: 0.72rem;">
+                                {{ loja.nome }}
+                            </span>
+                        {% empty %}
+                            <span class="text-muted small">Nenhuma</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if u.is_active %}
+                            <span class="badge badge-success-soft">Ativo</span>
+                        {% else %}
+                            <span class="badge badge-danger-soft">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'estoque:usuario_update' u.id %}" class="btn btn-outline-light rounded-start" title="Editar Usuário">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if u != request.user %}
+                            <a href="{% url 'estoque:usuario_toggle_status' u.id %}" class="btn btn-outline-warning rounded-end" title="{% if u.is_active %}Desativar{% else %}Ativar{% endif %}" onclick="return confirm('Deseja realmente {% if u.is_active %}desativar{% else %}ativar{% endif %} este usuário?');">
+                                <i class="bi {% if u.is_active %}bi-person-slash{% else %}bi-person-check{% endif %}"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="glass-panel p-5 text-center my-4">
+    <i class="bi bi-people fs-1 text-muted d-block mb-3"></i>
+    <h5 class="text-white fw-bold mb-1">Nenhum usuário cadastrado</h5>
+    <p class="text-muted">Crie o primeiro usuário para conceder acesso ao sistema.</p>
+    <a href="{% url 'estoque:usuario_create' %}" class="btn btn-primary-custom mt-2">
+        <i class="bi bi-person-plus me-1"></i> Criar Primeiro Usuário
+    </a>
+</div>
+{% endif %}
+{% endblock %}

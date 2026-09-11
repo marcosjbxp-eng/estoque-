@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestão de Lojas — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-6">
+        <h2 class="fw-bold text-white mb-1">
+            <i class="bi bi-shop text-primary me-2"></i>Gestão de Lojas
+        </h2>
+        <p class="text-muted mb-0">Cadastre, edite e gerencie as unidades do negócio.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'estoque:loja_create' %}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> Nova Loja
+        </a>
+    </div>
+</div>
+
+{% if lojas %}
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Nome da Loja</th>
+                    <th>Responsável</th>
+                    <th>Produtos</th>
+                    <th>Status</th>
+                    <th>Criada em</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loja in lojas %}
+                <tr class="{% if not loja.ativo %}opacity-50{% endif %}">
+                    <td>
+                        <div class="fw-bold text-white">{{ loja.nome }}</div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-circle text-muted"></i>
+                            <div>
+                                <div class="text-light small">{{ loja.responsavel.get_full_name|default:loja.responsavel.username }}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">{{ loja.responsavel.email|default:"—" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-primary-soft">
+                            {{ loja.total_produtos }} produto{{ loja.total_produtos|pluralize }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if loja.ativo %}
+                            <span class="badge badge-success-soft">Ativa</span>
+                        {% else %}
+                            <span class="badge badge-danger-soft">Inativa</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">{{ loja.criado_em|date:"d/m/Y" }}</td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'estoque:loja_update' loja.id %}" class="btn btn-outline-light rounded-start" title="Editar Loja">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'estoque:loja_toggle_status' loja.id %}" class="btn btn-outline-warning rounded-end" title="{% if loja.ativo %}Desativar{% else %}Ativar{% endif %}" onclick="return confirm('Deseja realmente {% if loja.ativo %}desativar{% else %}ativar{% endif %} esta loja?');">
+                                <i class="bi {% if loja.ativo %}bi-eye-slash{% else %}bi-check2{% endif %}"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="glass-panel p-5 text-center my-4">
+    <i class="bi bi-shop fs-1 text-muted d-block mb-3"></i>
+    <h5 class="text-white fw-bold mb-1">Nenhuma loja cadastrada</h5>
+    <p class="text-muted">Cadastre a primeira loja para começar a gerenciar seus produtos.</p>
+    <a href="{% url 'estoque:loja_create' %}" class="btn btn-primary-custom mt-2">
+        <i class="bi bi-plus-lg me-1"></i> Cadastrar Primeira Loja
+    </a>
+</div>
+{% endif %}
+{% endblock %}

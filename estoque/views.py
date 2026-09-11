@@ -1,17 +1,26 @@
 import json
+import csv
 from decimal import Decimal
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Q
+from django.core.paginator import Paginator
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Q, Count
 from django.db import transaction
+from django.http import HttpResponse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .models import Loja, Produto, ProdutoFoto, MovimentacaoEstoque
-from .forms import ProdutoForm, ProdutoFotoFormSet, MovimentacaoEstoqueForm
+from .forms import (
+    ProdutoForm, ProdutoFotoFormSet, MovimentacaoEstoqueForm,
+    LojaForm, UsuarioCreateForm, UsuarioEditForm,
+)
 from .mixins import is_admin_master, get_user_lojas
+from .relatorio_pdf import gerar_relatorio_pdf
 
 
 @login_required
@@ -118,8 +127,13 @@ def produto_list_view(request):
             Q(nome__icontains=query) | Q(sku__icontains=query) | Q(descricao__icontains=query)
         )
 
+    paginator = Paginator(produtos, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'produtos': produtos,
+        'produtos': page_obj,
+        'page_obj': page_obj,
         'query': query,
         'selected_loja_id': loja_id,
         'lojas_filtro': Loja.objects.filter(ativo=True) if is_admin_master(request.user) else [],
@@ -195,6 +209,7 @@ def produto_update_view(request, pk):
     return render(request, 'estoque/produto_form.html', context)
 
 
+@require_POST
 @login_required
 def produto_toggle_status_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
@@ -262,11 +277,285 @@ def movimentacao_list_view(request):
             Q(produto__nome__icontains=query) | Q(observacao__icontains=query)
         )
 
+    paginator = Paginator(movimentacoes, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Opções para o painel de download PDF
+    hoje = timezone.now().date()
+    meses_opcoes = [
+        (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'Março'), (4, 'Abril'),
+        (5, 'Maio'), (6, 'Junho'), (7, 'Julho'), (8, 'Agosto'),
+        (9, 'Setembro'), (10, 'Outubro'), (11, 'Novembro'), (12, 'Dezembro'),
+    ]
+    ano_atual = hoje.year
+    anos_opcoes = list(range(ano_atual, ano_atual - 5, -1))
+
     context = {
-        'movimentacoes': movimentacoes,
+        'movimentacoes': page_obj,
+        'page_obj': page_obj,
         'selected_loja_id': loja_id,
         'selected_tipo': tipo,
         'query': query,
         'lojas_filtro': Loja.objects.filter(ativo=True) if is_admin_master(request.user) else [],
+        'meses_opcoes': meses_opcoes,
+        'mes_atual': hoje.month,
+        'ano_atual': ano_atual,
+        'anos_opcoes': anos_opcoes,
     }
     return render(request, 'estoque/movimentacao_list.html', context)
+
+
+# ============================================================================
+# CRUD de Lojas (Admin Master)
+# ============================================================================
+
+@login_required
+def loja_list_view(request):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode gerenciar lojas.")
+
+    lojas = Loja.objects.annotate(
+        total_produtos=Count('produtos'),
+    ).select_related('responsavel').order_by('nome')
+
+    context = {'lojas': lojas}
+    return render(request, 'estoque/loja_list.html', context)
+
+
+@login_required
+def loja_create_view(request):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode criar lojas.")
+
+    if request.method == 'POST':
+        form = LojaForm(request.POST)
+        if form.is_valid():
+            loja = form.save()
+            messages.success(request, f"Loja '{loja.nome}' criada com sucesso!")
+            return redirect('estoque:loja_list')
+    else:
+        form = LojaForm()
+
+    context = {'form': form, 'titulo': 'Cadastrar Nova Loja'}
+    return render(request, 'estoque/loja_form.html', context)
+
+
+@login_required
+def loja_update_view(request, pk):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode editar lojas.")
+
+    loja = get_object_or_404(Loja, pk=pk)
+
+    if request.method == 'POST':
+        form = LojaForm(request.POST, instance=loja)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Loja '{loja.nome}' atualizada com sucesso!")
+            return redirect('estoque:loja_list')
+    else:
+        form = LojaForm(instance=loja)
+
+    context = {'form': form, 'loja': loja, 'titulo': f'Editar Loja — {loja.nome}'}
+    return render(request, 'estoque/loja_form.html', context)
+
+
+@require_POST
+@login_required
+def loja_toggle_status_view(request, pk):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode alterar o status de lojas.")
+
+    loja = get_object_or_404(Loja, pk=pk)
+    loja.ativo = not loja.ativo
+    loja.save(update_fields=['ativo'])
+
+    status_str = "ativada" if loja.ativo else "desativada"
+    messages.info(request, f"Loja '{loja.nome}' foi {status_str} com sucesso.")
+    return redirect('estoque:loja_list')
+
+
+# ============================================================================
+# Gestão de Usuários (Admin Master)
+# ============================================================================
+
+@login_required
+def usuario_list_view(request):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode gerenciar usuários.")
+
+    usuarios = User.objects.prefetch_related('lojas', 'groups').order_by('username')
+
+    context = {'usuarios': usuarios}
+    return render(request, 'estoque/usuario_list.html', context)
+
+
+@login_required
+def usuario_create_view(request):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode criar usuários.")
+
+    if request.method == 'POST':
+        form = UsuarioCreateForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f"Usuário '{user.username}' criado com sucesso!")
+            return redirect('estoque:usuario_list')
+    else:
+        form = UsuarioCreateForm()
+
+    context = {'form': form, 'titulo': 'Criar Novo Usuário'}
+    return render(request, 'estoque/usuario_form.html', context)
+
+
+@login_required
+def usuario_update_view(request, pk):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode editar usuários.")
+
+    usuario = get_object_or_404(User, pk=pk)
+
+    if request.method == 'POST':
+        form = UsuarioEditForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Usuário '{usuario.username}' atualizado com sucesso!")
+            return redirect('estoque:usuario_list')
+    else:
+        form = UsuarioEditForm(instance=usuario)
+
+    context = {'form': form, 'usuario': usuario, 'titulo': f'Editar Usuário — {usuario.username}'}
+    return render(request, 'estoque/usuario_form.html', context)
+
+
+@require_POST
+@login_required
+def usuario_toggle_status_view(request, pk):
+    if not is_admin_master(request.user):
+        raise PermissionDenied("Apenas Admin Master pode alterar o status de usuários.")
+
+    usuario = get_object_or_404(User, pk=pk)
+    if usuario == request.user:
+        messages.error(request, "Você não pode desativar a si mesmo.")
+        return redirect('estoque:usuario_list')
+
+    usuario.is_active = not usuario.is_active
+    usuario.save(update_fields=['is_active'])
+
+    status_str = "ativado" if usuario.is_active else "desativado"
+    messages.info(request, f"Usuário '{usuario.username}' foi {status_str} com sucesso.")
+    return redirect('estoque:usuario_list')
+
+
+# ============================================================================
+# Exportação CSV
+# ============================================================================
+
+@login_required
+def export_produtos_csv(request):
+    user_lojas = get_user_lojas(request.user)
+    produtos = Produto.objects.select_related('loja')
+
+    if not is_admin_master(request.user):
+        produtos = produtos.filter(loja__in=user_lojas)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="produtos.csv"'
+    response.write('\ufeff')  # BOM for Excel UTF-8
+
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['Nome', 'SKU', 'Loja', 'Preço Custo', 'Preço Venda', 'Estoque Atual', 'Status', 'Criado em'])
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku or 'N/A',
+            p.loja.nome,
+            f'{p.preco_custo:.2f}',
+            f'{p.preco_venda:.2f}',
+            p.quantidade_atual,
+            'Ativo' if p.ativo else 'Inativo',
+            p.criado_em.strftime('%d/%m/%Y %H:%M'),
+        ])
+
+    return response
+
+
+@login_required
+def export_movimentacoes_csv(request):
+    user_lojas = get_user_lojas(request.user)
+    movimentacoes = MovimentacaoEstoque.objects.select_related('produto', 'produto__loja', 'usuario')
+
+    if not is_admin_master(request.user):
+        movimentacoes = movimentacoes.filter(produto__loja__in=user_lojas)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="movimentacoes.csv"'
+    response.write('\ufeff')  # BOM for Excel UTF-8
+
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['Data/Hora', 'Produto', 'SKU', 'Loja', 'Tipo', 'Qtd', 'Preço Venda Unit.', 'Forma Pagamento', 'Parcelas', 'Lucro', 'Usuário', 'Observação'])
+
+    for m in movimentacoes:
+        writer.writerow([
+            m.criado_em.strftime('%d/%m/%Y %H:%M'),
+            m.produto.nome,
+            m.produto.sku or 'N/A',
+            m.produto.loja.nome,
+            m.get_tipo_display(),
+            m.quantidade,
+            f'{m.preco_venda_unitario:.2f}' if m.preco_venda_unitario else '—',
+            m.get_forma_pagamento_display() if m.forma_pagamento else '—',
+            f'{m.parcelas}x' if m.forma_pagamento == 'CARTAO_CREDITO' and m.parcelas else ('À vista' if m.forma_pagamento else '—'),
+            f'{m.lucro:.2f}' if m.tipo == MovimentacaoEstoque.TIPO_SAIDA else '—',
+            m.usuario.username,
+            m.observacao or '',
+        ])
+
+    return response
+
+
+@login_required
+def relatorio_mensal_pdf(request):
+    """Gera e retorna PDF com relatório mensal de vendas."""
+    user_lojas = get_user_lojas(request.user)
+
+    # Parâmetros
+    hoje = timezone.now().date()
+    try:
+        mes = int(request.GET.get('mes', hoje.month))
+        ano = int(request.GET.get('ano', hoje.year))
+    except (ValueError, TypeError):
+        mes = hoje.month
+        ano = hoje.year
+
+    loja_id = request.GET.get('loja_id', '')
+
+    # Filtrar movimentações do tipo saída no mês/ano
+    movimentacoes = MovimentacaoEstoque.objects.filter(
+        tipo=MovimentacaoEstoque.TIPO_SAIDA,
+        criado_em__year=ano,
+        criado_em__month=mes,
+    ).select_related('produto', 'produto__loja', 'usuario').order_by('criado_em')
+
+    loja_nome = None
+    if not is_admin_master(request.user):
+        movimentacoes = movimentacoes.filter(produto__loja__in=user_lojas)
+        if user_lojas.count() == 1:
+            loja_nome = user_lojas.first().nome
+    elif loja_id:
+        try:
+            loja = Loja.objects.get(pk=loja_id)
+            movimentacoes = movimentacoes.filter(produto__loja=loja)
+            loja_nome = loja.nome
+        except Loja.DoesNotExist:
+            pass
+
+    # Gerar PDF
+    buffer = gerar_relatorio_pdf(movimentacoes, mes, ano, loja_nome)
+
+    # Retornar como download
+    response = HttpResponse(buffer.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="relatorio_vendas_{mes:02d}_{ano}.pdf"'
+    return response

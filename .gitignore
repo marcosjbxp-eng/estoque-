@@ -19,3 +19,10 @@ desktop.ini
 
 .vercel
 .env*
+
+# Node & virtualenv
+node_modules/
+.venv/
+
+# Agent config (local)
+.agents/

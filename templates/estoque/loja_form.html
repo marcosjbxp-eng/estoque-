@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} — Estoque Master{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-1">
+                    <i class="bi bi-shop text-primary me-2"></i>{{ titulo }}
+                </h2>
+                <p class="text-muted mb-0">Defina o nome da loja e o responsável pela gestão.</p>
+            </div>
+            <a href="{% url 'estoque:loja_list' %}" class="btn btn-secondary-custom">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+
+        <form method="post" class="glass-panel p-4 p-sm-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show text-start py-2 px-3 small mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.nome.id_for_label }}">Nome da Loja <span class="text-danger">*</span></label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}<div class="text-danger small mt-1">{{ form.nome.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.responsavel.id_for_label }}">Responsável (Afiliado) <span class="text-danger">*</span></label>
+                    {{ form.responsavel }}
+                    <small class="text-muted d-block mt-1">Usuário que terá acesso à gestão dos produtos desta loja.</small>
+                    {% if form.responsavel.errors %}<div class="text-danger small mt-1">{{ form.responsavel.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check form-switch mt-2">
+                        {{ form.ativo }}
+                        <label class="form-check-label text-light fw-medium" for="{{ form.ativo.id_for_label }}">
+                            Loja Ativa (visível e operacional)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'estoque:loja_list' %}" class="btn btn-secondary-custom">Cancelar</a>
+                <button type="submit" class="btn btn-primary-custom px-4">
+                    <i class="bi bi-check-circle me-1"></i> Salvar Loja
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

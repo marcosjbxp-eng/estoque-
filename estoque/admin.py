@@ -14,14 +14,15 @@ class LojaAdmin(admin.ModelAdmin):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'loja', 'sku', 'preco_custo', 'preco_venda', 'quantidade_atual', 'ativo')
+    list_display = ('nome', 'slug', 'loja', 'sku', 'preco_custo', 'preco_venda', 'quantidade_atual', 'ativo')
     list_filter = ('loja', 'ativo')
-    search_fields = ('nome', 'sku', 'loja__nome')
+    search_fields = ('nome', 'slug', 'sku', 'loja__nome')
+    prepopulated_fields = {'slug': ('nome',)}
     inlines = [ProdutoFotoInline]
 
 @admin.register(MovimentacaoEstoque)
 class MovimentacaoEstoqueAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'tipo', 'quantidade', 'preco_venda_unitario', 'usuario', 'criado_em')
-    list_filter = ('tipo', 'produto__loja')
+    list_display = ('produto', 'tipo', 'quantidade', 'preco_venda_unitario', 'forma_pagamento', 'parcelas', 'usuario', 'criado_em')
+    list_filter = ('tipo', 'forma_pagamento', 'produto__loja')
     search_fields = ('produto__nome', 'usuario__username', 'observacao')
     readonly_fields = ('criado_em',)

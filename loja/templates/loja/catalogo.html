@@ -1,0 +1,165 @@
+{% extends 'loja/base.html' %}
+
+{% block title %}{% if query %}Busca: {{ query }}{% else %}Catálogo Oficial{% endif %}{% endblock %}
+
+{% block content %}
+<section class="space-y-6">
+
+    <!-- Barra de Contexto e Filtros (Estilo Shadcn / Limpo) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-800">
+        <div>
+            {% if query %}
+                <h1 class="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                    Resultados para <span class="text-brandBlue">“{{ query }}”</span>
+                </h1>
+                <p class="text-xs text-neutral-400 mt-1">
+                    {{ total_produtos }} produto{{ total_produtos|pluralize:"s" }} encontrado{{ total_produtos|pluralize:"s" }}
+                    <a href="{% url 'loja:catalogo' %}" class="ml-2 text-brandBlue hover:underline">Limpar busca</a>
+                </p>
+            {% else %}
+                <h1 class="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                    Catálogo de Produtos
+                </h1>
+                <p class="text-xs text-neutral-400 mt-0.5">
+                    {{ total_produtos }} produto{{ total_produtos|pluralize:"s" }} disponível{{ total_produtos|pluralize:"is" }} para pronta entrega ou encomenda
+                </p>
+            {% endif %}
+        </div>
+
+        {% if lojas|length > 1 %}
+        <form method="GET" action="{% url 'loja:catalogo' %}" class="flex items-center gap-2 text-xs">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            <label for="loja-select" class="text-neutral-400 font-medium">Unidade:</label>
+            <select id="loja-select" name="loja" onchange="this.form.submit()" class="bg-[#141517] border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:ring-1 focus:ring-brandBlue focus:border-neutral-700 transition">
+                <option value="">Todas as lojas</option>
+                {% for l in lojas %}
+                    <option value="{{ l.id }}" {% if selected_loja_id == l.id|stringformat:"s" %}selected{% endif %}>{{ l.nome }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- Grid de Produtos -->
+    {% if produtos %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+        {% for produto in produtos %}
+        <article class="bg-[#111214] border border-neutral-800/90 hover:border-neutral-700 rounded-xl overflow-hidden flex flex-col group transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40">
+            
+            <!-- Foto e Badges -->
+            <a href="{{ produto.get_absolute_url }}" class="block relative aspect-4/3 bg-[#161719] overflow-hidden p-4">
+                {% if produto.foto_principal %}
+                    <img 
+                        src="{{ produto.foto_principal.url }}" 
+                        alt="{{ produto.nome }}" 
+                        loading="lazy" 
+                        class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    >
+                {% else %}
+                    <div class="w-full h-full flex flex-col items-center justify-center text-neutral-600">
+                        <svg class="w-10 h-10 stroke-current" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-[11px] mt-1 text-neutral-500">Sem imagem</span>
+                    </div>
+                {% endif %}
+
+                <!-- Badges de Estoque -->
+                <div class="absolute top-2.5 left-2.5 flex flex-col gap-1">
+                    {% if produto.quantidade_atual > 0 %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 backdrop-blur-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Em estoque
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-amber-950/80 text-amber-400 border border-amber-500/30 backdrop-blur-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Sob encomenda
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Badge de Vídeo (se houver) -->
+                {% if produto.video %}
+                <div class="absolute top-2.5 right-2.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-neutral-900/90 text-neutral-200 border border-neutral-700/80 backdrop-blur-sm">
+                        <svg class="w-2.5 h-2.5 text-brandBlue fill-current" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Vídeo
+                    </span>
+                </div>
+                {% endif %}
+            </a>
+
+            <!-- Informações -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div>
+                    <h2 class="text-sm font-semibold text-neutral-100 line-clamp-2 leading-snug group-hover:text-brandBlue transition-colors">
+                        <a href="{{ produto.get_absolute_url }}">{{ produto.nome }}</a>
+                    </h2>
+                </div>
+
+                <!-- Preço -->
+                <div class="pt-2 border-t border-neutral-800/80">
+                    <div class="text-[11px] text-neutral-400 font-medium">À vista no Pix ou dinheiro</div>
+                    <div class="text-xl font-bold text-white tracking-tight">
+                        R$ {{ produto.preco_venda|floatformat:2 }}
+                    </div>
+                    {% if produto.parcela_12x > 0 %}
+                        <div class="text-[11px] text-neutral-400 mt-0.5">
+                            ou 12x de <strong class="text-neutral-300">R$ {{ produto.parcela_12x|floatformat:2 }}</strong>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <a 
+                        href="{{ produto.get_absolute_url }}" 
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg text-xs font-medium text-neutral-200 bg-[#1a1b1e] hover:bg-[#232428] border border-neutral-700/70 transition-colors text-center"
+                    >
+                        Ver detalhes
+                    </a>
+                    <a 
+                        href="{{ produto.whatsapp_url }}" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#25D366] hover:bg-[#20ba59] transition-all text-center shadow-sm"
+                    >
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                        Comprar
+                    </a>
+                </div>
+
+            </div>
+
+        </article>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="bg-[#111214] border border-neutral-800 rounded-xl p-10 text-center max-w-lg mx-auto space-y-4">
+        <div class="w-14 h-14 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mx-auto text-neutral-500">
+            <svg class="w-7 h-7 stroke-current" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+            </svg>
+        </div>
+        <h3 class="text-base font-semibold text-white">Nenhum produto encontrado</h3>
+        <p class="text-xs text-neutral-400">
+            Não encontramos nenhum produto {% if query %}com o termo “<strong class="text-neutral-200">{{ query }}</strong>”{% else %}disponível no momento{% endif %}.
+        </p>
+        <div class="pt-2 flex justify-center gap-3">
+            <a href="{% url 'loja:catalogo' %}" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-medium bg-brandBlue text-white hover:bg-brandBlueHover transition-colors">
+                Ver todos os produtos
+            </a>
+            <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-medium bg-[#1a1b1e] text-neutral-200 hover:text-white border border-neutral-700 transition-colors">
+                Pedir no WhatsApp
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</section>
+{% endblock %}

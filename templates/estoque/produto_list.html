@@ -5,12 +5,13 @@
 {% block content %}
 <div class="row align-items-center mb-4">
     <div class="col-md-6">
-        <h2 class="fw-bold text-white mb-1">
-            <i class="bi bi-box-seam text-primary me-2"></i>Gestão de Produtos
-        </h2>
-        <p class="text-muted mb-0">Cadastre, edite e gerencie o estoque dos produtos.</p>
+        <h2 class="fw-bold text-white mb-1">Produtos</h2>
+        <p class="text-muted mb-0">O que a loja vende. Clique em “Novo produto” para cadastrar; use as setas na linha para registrar entrada ou venda.</p>
     </div>
-    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+    <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+        <a href="{% url 'estoque:export_produtos_csv' %}" class="btn btn-secondary-custom">
+            <i class="bi bi-download me-1"></i> Exportar CSV
+        </a>
         <a href="{% url 'estoque:produto_create' %}" class="btn btn-primary-custom">
             <i class="bi bi-plus-lg me-1"></i> Novo Produto
         </a>
@@ -83,18 +84,23 @@
                     </td>
                     <td>
                         <div class="fw-bold text-white mb-0">{{ produto.nome }}</div>
+                        {% if produto.slug %}
+                            <a href="{% url 'loja:produto_detalhe' produto.slug %}" target="_blank" class="small text-decoration-none" style="color: #60a5fa; font-size: 0.75rem;">
+                                <i class="bi bi-link-45deg"></i>/loja/{{ produto.slug }}/
+                            </a>
+                        {% endif %}
                         {% if produto.descricao %}
-                            <small class="text-muted text-truncate d-block" style="max-width: 250px;">{{ produto.descricao }}</small>
+                            <small class="text-muted text-truncate d-block" style="max-width: 230px;">{{ produto.descricao }}</small>
                         {% endif %}
                     </td>
                     <td>
-                        <span class="badge bg-dark text-muted border border-secondary border-opacity-25 font-monospace">
+                        <span class="badge badge-sku">
                             {{ produto.sku|default:"N/A" }}
                         </span>
                     </td>
                     {% if is_admin_master %}
                     <td>
-                        <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                        <span class="badge badge-loja">
                             {{ produto.loja.nome }}
                         </span>
                     </td>
@@ -114,21 +120,26 @@
                     </td>
                     <td>
                         {% if produto.ativo %}
-                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Ativo</span>
+                            <span class="badge badge-success-soft">Ativo</span>
                         {% else %}
-                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">Inativo</span>
+                            <span class="badge badge-danger-soft">Inativo</span>
                         {% endif %}
                     </td>
                     <td class="text-end">
                         <div class="btn-group btn-group-sm">
-                            <a href="{% url 'estoque:movimentacao_create' produto.id %}" class="btn btn-outline-success rounded-start" title="Registrar Entrada/Saída">
-                                <i class="bi bi-arrow-left-right"></i> Movimentar
+                            {% if produto.slug %}
+                            <a href="{% url 'loja:produto_detalhe' produto.slug %}" target="_blank" class="btn btn-outline-info rounded-start" title="Ver Produto na Loja Virtual">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'estoque:movimentacao_create' produto.id %}" class="btn btn-outline-success {% if not produto.slug %}rounded-start{% endif %}" title="Registrar Entrada/Saída">
+                                <i class="bi bi-arrow-left-right"></i>
                             </a>
                             <a href="{% url 'estoque:produto_update' produto.id %}" class="btn btn-outline-light" title="Editar Produto">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a href="{% url 'estoque:produto_toggle_status' produto.id %}" class="btn btn-outline-warning rounded-end" title="{% if produto.ativo %}Desativar{% else %}Ativar{% endif %} (Soft Delete)" onclick="return confirm('Deseja realmente {% if produto.ativo %}desativar{% else %}ativar{% endif %} este produto?');">
-                                <i class="bi {% if produto.ativo %}bi-eye-slash{% else %}bi-eye{% endif %}"></i>
+                                <i class="bi {% if produto.ativo %}bi-eye-slash{% else %}bi-check2{% endif %}"></i>
                             </a>
                         </div>
                     </td>
@@ -147,5 +158,31 @@
         <i class="bi bi-plus-lg me-1"></i> Cadastrar Primeiro Produto
     </a>
 </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="mt-4 d-flex justify-content-center" aria-label="Navegação de páginas">
+    <ul class="pagination pagination-sm mb-0">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-light" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">&laquo; Anterior</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link bg-dark border-secondary text-light" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-light" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">Próxima &raquo;</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endif %}
 {% endblock %}

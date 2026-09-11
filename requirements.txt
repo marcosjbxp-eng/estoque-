@@ -10,3 +10,6 @@ django-allauth>=0.61.0
 whitenoise>=6.0.0
 dj-database-url>=2.1.0
 psycopg2-binary>=2.9.9
+reportlab>=4.0
+
+django-cors-headers>=4.3.0

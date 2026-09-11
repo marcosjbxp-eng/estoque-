@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>{% block title %}Catálogo Oficial{% endblock %} | Felipe Cell</title>
+    <meta name="description" content="{% block description %}Confira os smartphones e acessórios disponíveis a pronta entrega e sob encomenda na Felipe Cell.{% endblock %}">
+    <link rel="icon" type="image/png" href="/imgs/logo2.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: '#1e61e8',
+                        brandBlueHover: '#1850c4',
+                        brandDark: '#0e1013',
+                        brandCard: '#141619',
+                        brandBorder: '#23262a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#0b0c0e] text-neutral-100 font-sans min-h-screen flex flex-col antialiased selection:bg-brandBlue selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-[#0e1013]/90 backdrop-blur-md border-b border-[#23262a]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- Logo -->
+                <a href="{% url 'loja:catalogo' %}" class="flex items-center gap-2.5 shrink-0 group">
+                    <img src="/imgs/logob001.webp" alt="Felipe Cell" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-flex'">
+                    <span id="logo-fallback" class="font-bold text-lg text-white tracking-tight hidden items-center gap-1.5">
+                        <span class="text-brandBlue">Felipe</span>Cell
+                    </span>
+                </a>
+
+                <!-- Campo de Busca -->
+                <form action="{% url 'loja:catalogo' %}" method="GET" class="flex-1 max-w-lg mx-2 sm:mx-4" role="search">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input 
+                            type="search" 
+                            name="q" 
+                            value="{{ query|default:'' }}" 
+                            placeholder="Buscar celular, capa, fone..." 
+                            class="w-full bg-[#161718] border border-brandBorder text-sm text-neutral-100 placeholder-neutral-400 rounded-full pl-10 pr-4 py-2 focus:outline-none focus:border-brandBlue transition-colors"
+                        >
+                    </div>
+                </form>
+
+                <!-- Ações do Topo -->
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <a href="/" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white hover:bg-neutral-800/80 transition-colors border border-transparent hover:border-brandBorder">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Início
+                    </a>
+
+                    <a href="https://wa.me/5584987198381?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20uma%20d%C3%BAvida%20sobre%20os%20produtos%20da%20loja." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#25D366] text-white hover:bg-[#20ba59] transition-all shadow-sm">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        </svg>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Navegação de Categorias / Filtros Rápidos -->
+            <nav class="flex items-center gap-2 overflow-x-auto py-2.5 no-scrollbar text-xs font-medium border-t border-brandBorder/50">
+                <a href="{% url 'loja:catalogo' %}" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if not query and not selected_loja_id %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Todos os Produtos
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=iPhone" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'iPhone' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    iPhones
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=Xiaomi" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'Xiaomi' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Xiaomi / Redmi
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=Samsung" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'Samsung' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Samsung
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=Capa" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'Capa' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Capas & Películas
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=Fone" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'Fone' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Fones & Áudio
+                </a>
+                <a href="{% url 'loja:catalogo' %}?q=Carregador" class="px-3 py-1 rounded-full whitespace-nowrap transition-colors {% if query == 'Carregador' %}bg-brandBlue text-white{% else %}bg-brandCard text-neutral-300 hover:text-white hover:bg-neutral-800{% endif %}">
+                    Carregadores & Cabos
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brandDark border-t border-brandBorder mt-12 py-8 text-neutral-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8 text-center sm:text-left">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-brandCard border border-brandBorder text-brandBlue shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="block text-white">Garantia Comprovada</strong>
+                        <span>Assistência própria</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-brandCard border border-brandBorder text-brandBlue shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="block text-white">Porto do Mangue</strong>
+                        <span>Retirada ou entrega ágil</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-brandCard border border-brandBorder text-brandBlue shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="block text-white">Pix & Parcelamento</strong>
+                        <span>Até 12x no cartão</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-brandCard border border-brandBorder text-brandBlue shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="block text-white">Suporte Direto</strong>
+                        <span>Atendimento no WhatsApp</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-brandBorder/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                <p>© Felipe Cell — Todos os direitos reservados. Catálogo online oficial.</p>
+                <div class="flex gap-4">
+                    <a href="/" class="hover:text-white transition-colors">Página Inicial</a>
+                    <a href="https://wa.me/5584987198381" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Fale Conosco</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

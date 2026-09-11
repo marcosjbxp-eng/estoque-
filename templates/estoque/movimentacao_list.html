@@ -5,15 +5,62 @@
 {% block content %}
 <div class="row align-items-center mb-4">
     <div class="col-md-6">
-        <h2 class="fw-bold text-white mb-1">
-            <i class="bi bi-journal-text text-primary me-2"></i>Histórico de Movimentações
-        </h2>
-        <p class="text-muted mb-0">Registro auditável de todas as entradas e saídas de produtos.</p>
+        <h2 class="fw-bold text-white mb-1">Entradas e saídas</h2>
+        <p class="text-muted mb-0">Entrada = mercadoria chegou. Saída = vendeu. O lucro do painel nasce dessas saídas.</p>
     </div>
-    <div class="col-md-6 text-md-end mt-3 mt-md-0">
-        <a href="{% url 'estoque:produto_list' %}" class="btn btn-primary-custom">
+    <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+        <a href="{% url 'estoque:export_movimentacoes_csv' %}" class="btn btn-secondary-custom">
+            <i class="bi bi-download me-1"></i> Exportar CSV
+        </a>
+        <button type="button" class="btn btn-primary-custom" data-bs-toggle="collapse" data-bs-target="#painelPDF">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Baixar PDF Mensal
+        </button>
+        <a href="{% url 'estoque:produto_list' %}" class="btn btn-secondary-custom">
             <i class="bi bi-box-seam me-1"></i> Ir para Produtos
         </a>
+    </div>
+</div>
+
+<!-- Painel de Download PDF Mensal (Collapsible) -->
+<div class="collapse mb-4" id="painelPDF">
+    <div class="glass-panel p-4">
+        <h6 class="fw-bold text-white mb-3">
+            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>Gerar Relatório PDF Mensal de Vendas
+        </h6>
+        <form method="get" action="{% url 'estoque:relatorio_mensal_pdf' %}" class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+                <label class="form-label text-muted small fw-semibold" for="pdf_mes">Mês</label>
+                <select name="mes" id="pdf_mes" class="form-select">
+                    {% for m_val, m_nome in meses_opcoes %}
+                        <option value="{{ m_val }}" {% if m_val == mes_atual %}selected{% endif %}>{{ m_nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label text-muted small fw-semibold" for="pdf_ano">Ano</label>
+                <select name="ano" id="pdf_ano" class="form-select">
+                    {% for a in anos_opcoes %}
+                        <option value="{{ a }}" {% if a == ano_atual %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if is_admin_master %}
+            <div class="col-12 col-md-3">
+                <label class="form-label text-muted small fw-semibold" for="pdf_loja">Loja</label>
+                <select name="loja_id" id="pdf_loja" class="form-select">
+                    <option value="">Todas as Lojas</option>
+                    {% for loja in lojas_filtro %}
+                        <option value="{{ loja.id }}">{{ loja.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            <div class="col-12 col-md-3">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-download me-1"></i> Baixar PDF
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -72,6 +119,7 @@
                     <th>Tipo</th>
                     <th>Qtd</th>
                     <th>Preço Venda Unit.</th>
+                    <th>Pagamento</th>
                     <th>Lucro da Venda</th>
                     <th>Usuário</th>
                     <th>Observação</th>
@@ -89,7 +137,7 @@
                     </td>
                     {% if is_admin_master %}
                     <td>
-                        <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-25">
+                        <span class="badge badge-loja">
                             {{ mov.produto.loja.nome }}
                         </span>
                     </td>
@@ -116,8 +164,34 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if mov.forma_pagamento %}
+                            {% if mov.forma_pagamento == 'PIX' %}
+                                <span class="badge badge-success-soft">
+                                    <i class="bi bi-qr-code me-1"></i> PIX
+                                </span>
+                            {% elif mov.forma_pagamento == 'ESPECIE' %}
+                                <span class="badge badge-warning-soft">
+                                    <i class="bi bi-cash me-1"></i> Espécie
+                                </span>
+                            {% elif mov.forma_pagamento == 'CARTAO_DEBITO' %}
+                                <span class="badge badge-info-soft">
+                                    <i class="bi bi-credit-card me-1"></i> Débito
+                                </span>
+                            {% elif mov.forma_pagamento == 'CARTAO_CREDITO' %}
+                                <span class="badge badge-primary-soft">
+                                    <i class="bi bi-credit-card-2-front me-1"></i> Crédito
+                                    {% if mov.parcelas and mov.parcelas > 1 %}
+                                         <span class="ms-1">({{ mov.parcelas }}x)</span>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
                         {% if mov.tipo == 'SAIDA' %}
-                            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 fw-bold">
+                            <span class="badge badge-success-soft fw-bold">
                                 + R$ {{ mov.lucro|floatformat:2 }}
                             </span>
                         {% else %}
@@ -142,5 +216,31 @@
     <h5 class="text-white fw-bold mb-1">Nenhuma movimentação registrada</h5>
     <p class="text-muted">Não há registros de entradas ou saídas correspondentes aos filtros selecionados.</p>
 </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="mt-4 d-flex justify-content-center" aria-label="Navegação de páginas">
+    <ul class="pagination pagination-sm mb-0">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-light" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_tipo %}&tipo={{ selected_tipo }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">&laquo; Anterior</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link bg-dark border-secondary text-light" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_tipo %}&tipo={{ selected_tipo }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link bg-dark border-secondary text-light" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_tipo %}&tipo={{ selected_tipo }}{% endif %}{% if selected_loja_id %}&loja_id={{ selected_loja_id }}{% endif %}">Próxima &raquo;</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 {% endif %}
 {% endblock %}
