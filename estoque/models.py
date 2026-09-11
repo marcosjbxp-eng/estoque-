@@ -67,7 +67,12 @@ class Produto(models.Model):
         blank=True,
         null=True,
         verbose_name="Vídeo do Produto",
-        help_text="Vídeo curto do produto (MP4 recomendado, máx. 50MB)"
+        help_text="Vídeo curto do produto (máx. 15 segundos, MP4/MOV, máx. 50MB)"
+    )
+    video_com_audio = models.BooleanField(
+        default=True,
+        verbose_name="Vídeo com áudio",
+        help_text="Se desmarcado, o vídeo será processado sem áudio (mudo)."
     )
     ativo = models.BooleanField(default=True, verbose_name="Ativo (Soft Delete)")
     criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")

@@ -182,14 +182,25 @@
                         {{ form.video }}
                         <small class="text-muted d-block mt-1">Formatos: MP4, MOV, WEBM. <strong>Máximo 15 segundos</strong> e 50MB. O vídeo será otimizado automaticamente.</small>
                         {% if form.video.errors %}<div class="text-danger small mt-1">{{ form.video.errors.0 }}</div>{% endif %}
+
+                        <div class="form-check form-switch mt-3 p-2 bg-dark bg-opacity-50 rounded border border-secondary border-opacity-25 ps-5">
+                            {{ form.video_com_audio }}
+                            <label class="form-check-label text-light fw-medium small" for="{{ form.video_com_audio.id_for_label }}">
+                                <i class="bi bi-volume-up text-info me-1"></i> Vídeo com áudio
+                            </label>
+                            <small class="text-muted d-block" style="font-size: 0.76rem;">
+                                Desmarque esta opção se quiser remover totalmente o som do vídeo (remover ruídos e vozes de fundo).
+                            </small>
+                            {% if form.video_com_audio.errors %}<div class="text-danger small mt-1">{{ form.video_com_audio.errors.0 }}</div>{% endif %}
+                        </div>
                     </div>
                     <div class="col-12 col-md-5 text-center">
                         {% if produto and produto.video %}
-                            <video controls class="rounded border border-secondary border-opacity-25" style="max-height: 150px; max-width: 100%;">
+                            <video controls {% if not produto.video_com_audio %}muted{% endif %} class="rounded border border-secondary border-opacity-25" style="max-height: 150px; max-width: 100%;">
                                 <source src="{{ produto.video.url }}" type="video/mp4">
                                 Seu navegador não suporta vídeo.
                             </video>
-                            <small class="text-muted d-block mt-1">Vídeo atual</small>
+                            <small class="text-muted d-block mt-1">Vídeo atual {% if not produto.video_com_audio %}(sem som){% endif %}</small>
                         {% else %}
                             <div class="p-3 border border-secondary border-opacity-25 rounded bg-dark text-muted small">
                                 <i class="bi bi-camera-video fs-3 d-block mb-1"></i>

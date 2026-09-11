@@ -35,6 +35,7 @@
                                 controls 
                                 playsinline 
                                 preload="metadata"
+                                {% if not produto.video_com_audio %}muted{% endif %}
                                 class="w-full h-full object-cover"
                             >
                                 <source src="{{ produto.video_url_optimized }}" type="video/mp4">

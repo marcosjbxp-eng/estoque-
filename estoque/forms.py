@@ -79,7 +79,7 @@ def validar_video(file):
         )
 
 
-def otimizar_video(file):
+def otimizar_video(file, manter_audio=True):
     """Comprime e converte o vídeo com ffmpeg para alta qualidade visual e compatibilidade total com MOV/iPhone."""
     if not file or not hasattr(file, 'chunks'):
         return file
@@ -103,7 +103,9 @@ def otimizar_video(file):
             in_path = in_tmp.name
 
         out_path = in_path + '_opt.mp4'
-        # Alta qualidade visual (CRF 21), formato universal yuv420p essencial para MOV/iPhones, áudio 192k e faststart
+        # Se manter_audio=False, remove áudio completamente (-an). Senão, AAC 192k
+        audio_params = ['-acodec', 'aac', '-b:a', '192k'] if manter_audio else ['-an']
+
         cmd = [
             ffmpeg_bin, '-y',
             '-i', in_path,
@@ -111,8 +113,7 @@ def otimizar_video(file):
             '-vcodec', 'libx264',
             '-crf', '21',
             '-preset', 'medium',
-            '-acodec', 'aac',
-            '-b:a', '192k',
+            *audio_params,
             '-movflags', '+faststart',
             out_path
         ]
@@ -139,7 +140,7 @@ def otimizar_video(file):
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['loja', 'nome', 'slug', 'sku', 'descricao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'foto_principal', 'video', 'ativo']
+        fields = ['loja', 'nome', 'slug', 'sku', 'descricao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'foto_principal', 'video', 'video_com_audio', 'ativo']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iPhone 15 Pro Max'}),
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iphone-15-pro-max (opcional: gerado automaticamente)'}),
@@ -151,6 +152,7 @@ class ProdutoForm(forms.ModelForm):
             'loja': forms.Select(attrs={'class': 'form-select'}),
             'foto_principal': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'video': forms.FileInput(attrs={'class': 'form-control', 'accept': 'video/mp4,video/webm,video/quicktime,video/x-msvideo'}),
+            'video_com_audio': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -178,8 +180,11 @@ class ProdutoForm(forms.ModelForm):
 
     def clean_video(self):
         video = self.cleaned_data.get('video')
+        video_com_audio = self.cleaned_data.get('video_com_audio')
+        if video_com_audio is None:
+            video_com_audio = self.data.get('video_com_audio') in (True, 'true', 'on', '1')
         validar_video(video)
-        return otimizar_video(video)
+        return otimizar_video(video, manter_audio=bool(video_com_audio))
 
 
 class ProdutoFotoForm(forms.ModelForm):
