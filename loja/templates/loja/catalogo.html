@@ -71,8 +71,8 @@
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Em estoque
                         </span>
                     {% else %}
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-amber-950/80 text-amber-400 border border-amber-500/30 backdrop-blur-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Sob encomenda
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-950/80 text-rose-400 border border-rose-500/30 backdrop-blur-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Esgotado
                         </span>
                     {% endif %}
                 </div>
@@ -115,10 +115,11 @@
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <a 
                         href="{{ produto.get_absolute_url }}" 
-                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg text-xs font-medium text-neutral-200 bg-[#1a1b1e] hover:bg-[#232428] border border-neutral-700/70 transition-colors text-center"
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-lg text-xs font-medium text-neutral-200 bg-[#1a1b1e] hover:bg-[#232428] border border-neutral-700/70 transition-colors text-center {% if produto.quantidade_atual <= 0 %}col-span-2 text-neutral-400{% endif %}"
                     >
-                        Ver detalhes
+                        {% if produto.quantidade_atual <= 0 %}Ver detalhes (Esgotado){% else %}Ver detalhes{% endif %}
                     </a>
+                    {% if produto.quantidade_atual > 0 %}
                     <a 
                         href="{{ produto.whatsapp_url }}" 
                         target="_blank" 
@@ -130,6 +131,7 @@
                         </svg>
                         Comprar
                     </a>
+                    {% endif %}
                 </div>
 
             </div>

@@ -59,16 +59,23 @@
                     {% if form.sku.errors %}<div class="text-danger small mt-1">{{ form.sku.errors.0 }}</div>{% endif %}
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4">
                     <label class="form-label" for="{{ form.preco_custo.id_for_label }}">Preço de Custo (R$) <span class="text-danger">*</span></label>
                     {{ form.preco_custo }}
                     {% if form.preco_custo.errors %}<div class="text-danger small mt-1">{{ form.preco_custo.errors.0 }}</div>{% endif %}
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4">
                     <label class="form-label" for="{{ form.preco_venda.id_for_label }}">Preço de Venda (R$) <span class="text-danger">*</span></label>
                     {{ form.preco_venda }}
                     {% if form.preco_venda.errors %}<div class="text-danger small mt-1">{{ form.preco_venda.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="{{ form.quantidade_atual.id_for_label }}">Quantidade em Estoque <span class="text-danger">*</span></label>
+                    {{ form.quantidade_atual }}
+                    <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">Itens disponíveis para venda imediata.</small>
+                    {% if form.quantidade_atual.errors %}<div class="text-danger small mt-1">{{ form.quantidade_atual.errors.0 }}</div>{% endif %}
                 </div>
 
                 <div class="col-12">
@@ -173,7 +180,7 @@
                 <div class="row align-items-center g-3">
                     <div class="col-12 col-md-7">
                         {{ form.video }}
-                        <small class="text-muted d-block mt-1">Formatos: MP4, MOV, WEBM. Máximo 50MB. Será otimizado automaticamente para entrega rápida.</small>
+                        <small class="text-muted d-block mt-1">Formatos: MP4, MOV, WEBM. <strong>Máximo 15 segundos</strong> e 50MB. O vídeo será otimizado automaticamente.</small>
                         {% if form.video.errors %}<div class="text-danger small mt-1">{{ form.video.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="col-12 col-md-5 text-center">
@@ -361,6 +368,25 @@
                     const val = formatSlug(this.value);
                     slugPreview.textContent = val || 'exemplo-do-produto';
                 }
+            });
+        }
+
+        // Validação instantânea de duração máxima do vídeo (15s)
+        const inputVideo = document.getElementById('{{ form.video.id_for_label }}');
+        if (inputVideo) {
+            inputVideo.addEventListener('change', function() {
+                const file = this.files && this.files[0];
+                if (!file) return;
+                const tempVideo = document.createElement('video');
+                tempVideo.preload = 'metadata';
+                tempVideo.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(tempVideo.src);
+                    if (tempVideo.duration > 15.5) {
+                        alert(`Atenção: O vídeo selecionado possui ${tempVideo.duration.toFixed(1)} segundos.\nO limite máximo permitido para vídeos de vendas é de 15 segundos.`);
+                        inputVideo.value = '';
+                    }
+                };
+                tempVideo.src = URL.createObjectURL(file);
             });
         }
     });

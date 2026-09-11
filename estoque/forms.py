@@ -8,11 +8,59 @@ MAX_IMAGE_SIZE_MB = 5
 MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024
 MAX_VIDEO_SIZE_MB = 50
 MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024
+MAX_VIDEO_DURATION_SECONDS = 15.0
 VIDEO_EXTENSIONS = ('.mp4', '.mov', '.webm', '.avi')
 
 def validar_tamanho_imagem(file):
     if file and file.size > MAX_IMAGE_SIZE_BYTES:
         raise ValidationError(f"O tamanho máximo permitido por imagem é {MAX_IMAGE_SIZE_MB}MB.")
+
+def obter_duracao_video(file):
+    """Obtém a duração do vídeo em segundos usando ffprobe se disponível."""
+    if not file:
+        return None
+    import shutil
+    import subprocess
+    import tempfile
+    import os
+
+    ffprobe_bin = shutil.which('ffprobe')
+    if not ffprobe_bin:
+        return None
+
+    in_path = None
+    try:
+        ext = os.path.splitext(file.name)[1].lower() or '.mp4'
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as in_tmp:
+            if hasattr(file, 'chunks'):
+                for chunk in file.chunks():
+                    in_tmp.write(chunk)
+            else:
+                pos = file.tell() if hasattr(file, 'tell') else 0
+                in_tmp.write(file.read())
+                if hasattr(file, 'seek'):
+                    file.seek(pos)
+            in_path = in_tmp.name
+
+        cmd = [
+            ffprobe_bin,
+            '-v', 'error',
+            '-show_entries', 'format=duration',
+            '-of', 'default=noprint_wrappers=1:nokey=1',
+            in_path
+        ]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, timeout=10)
+        if res.returncode == 0 and res.stdout.strip():
+            return float(res.stdout.strip())
+    except Exception:
+        pass
+    finally:
+        if in_path and os.path.exists(in_path):
+            try:
+                os.remove(in_path)
+            except Exception:
+                pass
+    return None
 
 def validar_video(file):
     if not file:
@@ -23,6 +71,12 @@ def validar_video(file):
         raise ValidationError(f"Formato de vídeo não suportado. Use: {', '.join(VIDEO_EXTENSIONS)}")
     if file.size > MAX_VIDEO_SIZE_BYTES:
         raise ValidationError(f"O tamanho máximo permitido por vídeo é {MAX_VIDEO_SIZE_MB}MB.")
+    
+    duracao = obter_duracao_video(file)
+    if duracao is not None and duracao > (MAX_VIDEO_DURATION_SECONDS + 0.5):
+        raise ValidationError(
+            f"O vídeo de vendas deve ter no máximo 15 segundos de duração (duração detectada: {duracao:.1f}s)."
+        )
 
 
 def otimizar_video(file):
@@ -82,7 +136,7 @@ def otimizar_video(file):
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['loja', 'nome', 'slug', 'sku', 'descricao', 'preco_custo', 'preco_venda', 'foto_principal', 'video', 'ativo']
+        fields = ['loja', 'nome', 'slug', 'sku', 'descricao', 'preco_custo', 'preco_venda', 'quantidade_atual', 'foto_principal', 'video', 'ativo']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iPhone 15 Pro Max'}),
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iphone-15-pro-max (opcional: gerado automaticamente)'}),
@@ -90,6 +144,7 @@ class ProdutoForm(forms.ModelForm):
             'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descrição detalhada do produto...'}),
             'preco_custo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
             'preco_venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
+            'quantidade_atual': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': '0'}),
             'loja': forms.Select(attrs={'class': 'form-select'}),
             'foto_principal': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'video': forms.FileInput(attrs={'class': 'form-control', 'accept': 'video/mp4,video/webm,video/quicktime,video/x-msvideo'}),
@@ -106,6 +161,12 @@ class ProdutoForm(forms.ModelForm):
                 self.fields['loja'].initial = self.fields['loja'].queryset.first()
         else:
             self.fields['loja'].queryset = Loja.objects.filter(ativo=True)
+
+    def clean_quantidade_atual(self):
+        qtd = self.cleaned_data.get('quantidade_atual')
+        if qtd is None or qtd < 0:
+            return 0
+        return qtd
 
     def clean_foto_principal(self):
         foto = self.cleaned_data.get('foto_principal')
