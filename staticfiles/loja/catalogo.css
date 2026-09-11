@@ -1,0 +1,27 @@
+﻿/* Store layout only. Theme: css/design-system.css. */
+.cabecalho { margin-bottom: var(--fc-space-7); }
+.grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--fc-space-5); }
+.produto { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.produto__midia, .detalhe__sem-imagem { aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--fc-text-muted); background: var(--fc-bg); text-decoration: none; }
+.produto__midia { border-bottom: 1px solid var(--fc-border); }
+.produto__midia img { width: 100%; height: 100%; object-fit: cover; }
+.produto__conteudo { flex: 1; display: flex; flex-direction: column; align-items: start; padding: var(--fc-space-5); overflow-wrap: anywhere; }
+.produto h2 { margin: var(--fc-space-2) 0 var(--fc-space-3); font-size: 1.25rem; line-height: 1.3; font-weight: 700; }
+.produto h2 a { color: var(--fc-text); text-decoration: none; }
+.produto h2 a:hover { text-decoration: underline; }
+.produto__conteudo p { margin: 0 0 var(--fc-space-5); color: var(--fc-text-secondary); font-size: var(--fc-small-size); }
+.produto strong { margin-top: auto; margin-bottom: var(--fc-space-5); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.produto__conteudo .fc-button { width: 100%; }
+.detalhe { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: var(--fc-space-7); align-items: start; }
+.detalhe__midia { display: grid; gap: var(--fc-space-3); min-width: 0; }
+.detalhe__imagem, .detalhe__sem-imagem { width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--fc-border); border-radius: var(--fc-radius); object-fit: cover; background: var(--fc-surface); }
+.detalhe__galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--fc-space-3); }
+.detalhe__galeria img { width: 100%; aspect-ratio: 1; border-radius: var(--fc-control-radius); border: 1px solid var(--fc-border); object-fit: cover; }
+.detalhe__conteudo { padding: var(--fc-space-6); overflow-wrap: anywhere; }
+.detalhe__conteudo h1 { margin-top: var(--fc-space-3); font-size: var(--fc-section-size); }
+.detalhe__descricao { color: var(--fc-text-secondary); white-space: pre-line; }
+.detalhe__preco { display: block; margin-top: var(--fc-space-6); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+@media (max-width: 767px) {
+    .detalhe { grid-template-columns: 1fr; gap: var(--fc-space-5); }
+    .detalhe__conteudo { padding: var(--fc-space-5); }
+}
