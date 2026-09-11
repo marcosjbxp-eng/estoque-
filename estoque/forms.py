@@ -80,7 +80,7 @@ def validar_video(file):
 
 
 def otimizar_video(file):
-    """Comprime o vídeo com ffmpeg antes do upload se disponível e se reduzir peso."""
+    """Comprime e converte o vídeo com ffmpeg para alta qualidade visual e compatibilidade total com MOV/iPhone."""
     if not file or not hasattr(file, 'chunks'):
         return file
     import shutil
@@ -96,31 +96,34 @@ def otimizar_video(file):
     in_path = None
     out_path = None
     try:
-        ext = os.path.splitext(file.name)[1].lower() or '.mp4'
-        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as in_tmp:
+        raw_ext = os.path.splitext(file.name)[1].lower() or '.mp4'
+        with tempfile.NamedTemporaryFile(suffix=raw_ext, delete=False) as in_tmp:
             for chunk in file.chunks():
                 in_tmp.write(chunk)
             in_path = in_tmp.name
 
         out_path = in_path + '_opt.mp4'
+        # Alta qualidade visual (CRF 21), formato universal yuv420p essencial para MOV/iPhones, áudio 192k e faststart
         cmd = [
             ffmpeg_bin, '-y',
             '-i', in_path,
-            '-vf', "scale='min(1080,iw)':-2",
+            '-vf', "scale='min(1080,iw)':-2,format=yuv420p",
             '-vcodec', 'libx264',
-            '-crf', '28',
-            '-preset', 'fast',
+            '-crf', '21',
+            '-preset', 'medium',
             '-acodec', 'aac',
-            '-b:a', '128k',
+            '-b:a', '192k',
             '-movflags', '+faststart',
             out_path
         ]
         res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=45)
         if res.returncode == 0 and os.path.exists(out_path) and os.path.getsize(out_path) > 0:
-            if os.path.getsize(out_path) < file.size:
-                with open(out_path, 'rb') as f:
-                    compressed_content = f.read()
-                return ContentFile(compressed_content, name=file.name)
+            with open(out_path, 'rb') as f:
+                compressed_content = f.read()
+            # Converte nome para .mp4 caso venha .mov do iPhone
+            base_name = os.path.splitext(file.name)[0]
+            new_name = f"{base_name}.mp4"
+            return ContentFile(compressed_content, name=new_name)
     except Exception:
         pass
     finally:

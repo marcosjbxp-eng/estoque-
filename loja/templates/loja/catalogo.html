@@ -46,8 +46,8 @@
         {% for produto in produtos %}
         <article class="bg-[#111214] border border-neutral-800/90 hover:border-neutral-700 rounded-xl overflow-hidden flex flex-col group transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40">
             
-            <!-- Foto e Badges -->
-            <a href="{{ produto.get_absolute_url }}" class="block relative aspect-4/3 bg-[#161719] overflow-hidden p-4">
+            <!-- Foto e Badges (Proporção 1x1 Quadrada) -->
+            <a href="{{ produto.get_absolute_url }}" class="block relative aspect-square bg-[#161719] overflow-hidden p-4">
                 {% if produto.foto_principal %}
                     <img 
                         src="{{ produto.foto_principal.url }}" 
