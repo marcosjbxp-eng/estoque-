@@ -44,11 +44,8 @@
             <div class="flex items-center justify-between h-16 gap-4">
                 
                 <!-- Logo -->
-                <a href="{% url 'loja:catalogo' %}" class="flex items-center gap-2.5 shrink-0 group">
-                    <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='inline-flex'">
-                    <span id="logo-fallback" class="font-bold text-lg text-white tracking-tight hidden items-center gap-1.5">
-                        <span class="text-brandBlue">Felipe</span>Cell
-                    </span>
+                <a href="{% url 'loja:catalogo' %}" class="flex items-center group shrink-0 transition-opacity hover:opacity-90">
+                    <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell Logo" class="h-7 sm:h-8 w-auto object-contain">
                 </a>
 
                 <!-- Campo de Busca -->

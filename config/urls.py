@@ -31,13 +31,14 @@ urlpatterns = [
     path('loja/', include('loja.urls')),
 ]
 
+# Servir arquivos da página de vendas (imgs e videos com cache)
+urlpatterns += [
+    path('videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
+    path('vendas/videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
+    path('imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
+    path('vendas/imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
+]
+
 if settings.DEBUG:
-    # Servir arquivos estáticos da página de vendas apenas em dev
-    urlpatterns += [
-        path('videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
-        path('vendas/videos/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'videos'}),
-        path('imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
-        path('vendas/imgs/<path:path>', cache_page(cache_time)(serve), {'document_root': settings.BASE_DIR / 'pagina-vendas' / 'imgs'}),
-    ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
