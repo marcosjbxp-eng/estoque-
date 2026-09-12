@@ -9,8 +9,8 @@
         <p class="text-muted mb-0">Entrada = mercadoria chegou. Saída = vendeu. O lucro do painel nasce dessas saídas.</p>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
-        <a href="{% url 'estoque:export_movimentacoes_csv' %}" class="btn btn-secondary-custom">
-            <i class="bi bi-download me-1"></i> Exportar CSV
+        <a href="{% url 'estoque:movimentacao_geral_create' %}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> Criar Movimentação
         </a>
         <button type="button" class="btn btn-primary-custom" data-bs-toggle="collapse" data-bs-target="#painelPDF">
             <i class="bi bi-file-earmark-pdf me-1"></i> Baixar PDF Mensal

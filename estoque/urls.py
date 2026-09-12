@@ -13,6 +13,7 @@ urlpatterns = [
     path('produtos/<int:pk>/alternar-status/', views.produto_toggle_status_view, name='produto_toggle_status'),
     path('produtos/<int:produto_pk>/movimentar/', views.movimentacao_create_view, name='movimentacao_create'),
     path('movimentacoes/', views.movimentacao_list_view, name='movimentacao_list'),
+    path('movimentacoes/nova/', views.movimentacao_geral_create_view, name='movimentacao_geral_create'),
 
     # Lojas (Admin Master)
     path('lojas/', views.loja_list_view, name='loja_list'),

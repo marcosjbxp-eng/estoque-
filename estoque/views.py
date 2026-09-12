@@ -16,8 +16,8 @@ from django.views.decorators.http import require_POST
 
 from .models import Loja, Produto, ProdutoFoto, MovimentacaoEstoque
 from .forms import (
-    ProdutoForm, ProdutoFotoFormSet, MovimentacaoEstoqueForm,
-    LojaForm, UsuarioCreateForm, UsuarioEditForm,
+    ProdutoForm, ProdutoFotoFormSet, MovimentacaoEstoqueForm, MovimentacaoEstoqueGeralForm,
+    LojaForm, UsuarioForm, UsuarioCreateForm, UsuarioEditForm,
 )
 from .mixins import is_admin_master, get_user_lojas
 from .relatorio_pdf import gerar_relatorio_pdf
@@ -28,7 +28,7 @@ def dashboard_view(request):
     user_lojas = get_user_lojas(request.user)
     selected_loja_id = request.GET.get('loja_id')
 
-    # Query base para saídas
+    # Query base para saÃ­das
     saidas_qs = MovimentacaoEstoque.objects.filter(
         tipo=MovimentacaoEstoque.TIPO_SAIDA,
         preco_venda_unitario__isnull=False
@@ -39,7 +39,7 @@ def dashboard_view(request):
     elif selected_loja_id:
         saidas_qs = saidas_qs.filter(produto__loja_id=selected_loja_id)
 
-    # Cálculo do Lucro Acumulado Total
+    # CÃ¡lculo do Lucro Acumulado Total
     lucro_total = Decimal('0.00')
     total_saidas_qtd = 0
     total_vendas_valor = Decimal('0.00')
@@ -49,13 +49,13 @@ def dashboard_view(request):
         total_saidas_qtd += mov.quantidade
         total_vendas_valor += (mov.preco_venda_unitario * mov.quantidade)
 
-    # Cálculo de Lucro Mensal (Últimos 12 Meses)
+    # CÃ¡lculo de Lucro Mensal (Ãšltimos 12 Meses)
     hoje = timezone.now().date()
     meses_labels = []
     lucros_mensais = []
 
     for i in range(11, -1, -1):
-        # Calcular primeiro e último dia do mês correspondente
+        # Calcular primeiro e Ãºltimo dia do mÃªs correspondente
         mes_dt = hoje.replace(day=1) - timedelta(days=i*30)
         ano = mes_dt.year
         mes = mes_dt.month
@@ -82,7 +82,7 @@ def dashboard_view(request):
             lojas_labels.append(loja.nome)
             lojas_lucros.append(float(lucro_l))
 
-    # Produtos mais rentáveis
+    # Produtos mais rentÃ¡veis
     produtos_qs = Produto.objects.filter(ativo=True)
     if not is_admin_master(request.user):
         produtos_qs = produtos_qs.filter(loja__in=user_lojas)
@@ -146,7 +146,7 @@ def produto_create_view(request):
     user_lojas = get_user_lojas(request.user)
 
     if not user_lojas.exists():
-        messages.error(request, "Você não possui nenhuma loja associada para cadastrar produtos.")
+        messages.error(request, "VocÃª nÃ£o possui nenhuma loja associada para cadastrar produtos.")
         return redirect('estoque:produto_list')
 
     if request.method == 'POST':
@@ -156,7 +156,7 @@ def produto_create_view(request):
         if form.is_valid() and formset.is_valid():
             loja = form.cleaned_data['loja']
             if not is_admin_master(request.user) and loja.responsavel != request.user:
-                raise PermissionDenied("Operação não permitida para esta loja.")
+                raise PermissionDenied("OperaÃ§Ã£o nÃ£o permitida para esta loja.")
 
             with transaction.atomic():
                 produto = form.save()
@@ -183,7 +183,7 @@ def produto_update_view(request, pk):
 
     # Validar isolamento de loja no backend
     if not is_admin_master(request.user) and produto.loja.responsavel != request.user:
-        raise PermissionDenied("Você não tem permissão para editar produtos desta loja.")
+        raise PermissionDenied("VocÃª nÃ£o tem permissÃ£o para editar produtos desta loja.")
 
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES, instance=produto, user=request.user)
@@ -204,7 +204,7 @@ def produto_update_view(request, pk):
         'form': form,
         'formset': formset,
         'produto': produto,
-        'titulo': f"Editar Produto — {produto.nome}",
+        'titulo': f"Editar Produto â€” {produto.nome}",
     }
     return render(request, 'estoque/produto_form.html', context)
 
@@ -215,7 +215,7 @@ def produto_toggle_status_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
 
     if not is_admin_master(request.user) and produto.loja.responsavel != request.user:
-        raise PermissionDenied("Você não tem permissão para alterar o status deste produto.")
+        raise PermissionDenied("VocÃª nÃ£o tem permissÃ£o para alterar o status deste produto.")
 
     produto.ativo = not produto.ativo
     produto.save(update_fields=['ativo'])
@@ -230,7 +230,7 @@ def movimentacao_create_view(request, produto_pk):
     produto = get_object_or_404(Produto, pk=produto_pk)
 
     if not is_admin_master(request.user) and produto.loja.responsavel != request.user:
-        raise PermissionDenied("Você não tem permissão para movimentar o estoque deste produto.")
+        raise PermissionDenied("VocÃª nÃ£o tem permissÃ£o para movimentar o estoque deste produto.")
 
     if request.method == 'POST':
         form = MovimentacaoEstoqueForm(request.POST, produto=produto)
@@ -242,7 +242,7 @@ def movimentacao_create_view(request, produto_pk):
 
             messages.success(
                 request,
-                f"Movimentação de {movimentacao.get_tipo_display()} registrada com sucesso para {produto.nome}!"
+                f"MovimentaÃ§Ã£o de {movimentacao.get_tipo_display()} registrada com sucesso para {produto.nome}!"
             )
             return redirect('estoque:produto_list')
     else:
@@ -281,10 +281,10 @@ def movimentacao_list_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Opções para o painel de download PDF
+    # OpÃ§Ãµes para o painel de download PDF
     hoje = timezone.now().date()
     meses_opcoes = [
-        (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'Março'), (4, 'Abril'),
+        (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'MarÃ§o'), (4, 'Abril'),
         (5, 'Maio'), (6, 'Junho'), (7, 'Julho'), (8, 'Agosto'),
         (9, 'Setembro'), (10, 'Outubro'), (11, 'Novembro'), (12, 'Dezembro'),
     ]
@@ -357,7 +357,7 @@ def loja_update_view(request, pk):
     else:
         form = LojaForm(instance=loja)
 
-    context = {'form': form, 'loja': loja, 'titulo': f'Editar Loja — {loja.nome}'}
+    context = {'form': form, 'loja': loja, 'titulo': f'Editar Loja â€” {loja.nome}'}
     return render(request, 'estoque/loja_form.html', context)
 
 
@@ -377,13 +377,13 @@ def loja_toggle_status_view(request, pk):
 
 
 # ============================================================================
-# Gestão de Usuários (Admin Master)
+# GestÃ£o de UsuÃ¡rios (Admin Master)
 # ============================================================================
 
 @login_required
 def usuario_list_view(request):
     if not is_admin_master(request.user):
-        raise PermissionDenied("Apenas Admin Master pode gerenciar usuários.")
+        raise PermissionDenied("Apenas Admin Master pode gerenciar usuÃ¡rios.")
 
     usuarios = User.objects.prefetch_related('lojas', 'groups').order_by('username')
 
@@ -394,25 +394,25 @@ def usuario_list_view(request):
 @login_required
 def usuario_create_view(request):
     if not is_admin_master(request.user):
-        raise PermissionDenied("Apenas Admin Master pode criar usuários.")
+        raise PermissionDenied("Apenas Admin Master pode criar usuÃ¡rios.")
 
     if request.method == 'POST':
         form = UsuarioCreateForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, f"Usuário '{user.username}' criado com sucesso!")
+            messages.success(request, f"UsuÃ¡rio '{user.username}' criado com sucesso!")
             return redirect('estoque:usuario_list')
     else:
         form = UsuarioCreateForm()
 
-    context = {'form': form, 'titulo': 'Criar Novo Usuário'}
+    context = {'form': form, 'titulo': 'Criar Novo UsuÃ¡rio'}
     return render(request, 'estoque/usuario_form.html', context)
 
 
 @login_required
 def usuario_update_view(request, pk):
     if not is_admin_master(request.user):
-        raise PermissionDenied("Apenas Admin Master pode editar usuários.")
+        raise PermissionDenied("Apenas Admin Master pode editar usuÃ¡rios.")
 
     usuario = get_object_or_404(User, pk=pk)
 
@@ -420,12 +420,12 @@ def usuario_update_view(request, pk):
         form = UsuarioEditForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()
-            messages.success(request, f"Usuário '{usuario.username}' atualizado com sucesso!")
+            messages.success(request, f"UsuÃ¡rio '{usuario.username}' atualizado com sucesso!")
             return redirect('estoque:usuario_list')
     else:
         form = UsuarioEditForm(instance=usuario)
 
-    context = {'form': form, 'usuario': usuario, 'titulo': f'Editar Usuário — {usuario.username}'}
+    context = {'form': form, 'usuario': usuario, 'titulo': f'Editar UsuÃ¡rio â€” {usuario.username}'}
     return render(request, 'estoque/usuario_form.html', context)
 
 
@@ -433,23 +433,23 @@ def usuario_update_view(request, pk):
 @login_required
 def usuario_toggle_status_view(request, pk):
     if not is_admin_master(request.user):
-        raise PermissionDenied("Apenas Admin Master pode alterar o status de usuários.")
+        raise PermissionDenied("Apenas Admin Master pode alterar o status de usuÃ¡rios.")
 
     usuario = get_object_or_404(User, pk=pk)
     if usuario == request.user:
-        messages.error(request, "Você não pode desativar a si mesmo.")
+        messages.error(request, "VocÃª nÃ£o pode desativar a si mesmo.")
         return redirect('estoque:usuario_list')
 
     usuario.is_active = not usuario.is_active
     usuario.save(update_fields=['is_active'])
 
     status_str = "ativado" if usuario.is_active else "desativado"
-    messages.info(request, f"Usuário '{usuario.username}' foi {status_str} com sucesso.")
+    messages.info(request, f"UsuÃ¡rio '{usuario.username}' foi {status_str} com sucesso.")
     return redirect('estoque:usuario_list')
 
 
 # ============================================================================
-# Exportação CSV
+# ExportaÃ§Ã£o CSV
 # ============================================================================
 
 @login_required
@@ -465,7 +465,7 @@ def export_produtos_csv(request):
     response.write('\ufeff')  # BOM for Excel UTF-8
 
     writer = csv.writer(response, delimiter=';')
-    writer.writerow(['Nome', 'SKU', 'Loja', 'Preço Custo', 'Preço Venda', 'Estoque Atual', 'Status', 'Criado em'])
+    writer.writerow(['Nome', 'SKU', 'Loja', 'PreÃ§o Custo', 'PreÃ§o Venda', 'Estoque Atual', 'Status', 'Criado em'])
 
     for p in produtos:
         writer.writerow([
@@ -495,7 +495,7 @@ def export_movimentacoes_csv(request):
     response.write('\ufeff')  # BOM for Excel UTF-8
 
     writer = csv.writer(response, delimiter=';')
-    writer.writerow(['Data/Hora', 'Produto', 'SKU', 'Loja', 'Tipo', 'Qtd', 'Preço Venda Unit.', 'Forma Pagamento', 'Parcelas', 'Lucro', 'Usuário', 'Observação'])
+    writer.writerow(['Data/Hora', 'Produto', 'SKU', 'Loja', 'Tipo', 'Qtd', 'PreÃ§o Venda Unit.', 'Forma Pagamento', 'Parcelas', 'Lucro', 'UsuÃ¡rio', 'ObservaÃ§Ã£o'])
 
     for m in movimentacoes:
         writer.writerow([
@@ -505,10 +505,10 @@ def export_movimentacoes_csv(request):
             m.produto.loja.nome,
             m.get_tipo_display(),
             m.quantidade,
-            f'{m.preco_venda_unitario:.2f}' if m.preco_venda_unitario else '—',
-            m.get_forma_pagamento_display() if m.forma_pagamento else '—',
-            f'{m.parcelas}x' if m.forma_pagamento == 'CARTAO_CREDITO' and m.parcelas else ('À vista' if m.forma_pagamento else '—'),
-            f'{m.lucro:.2f}' if m.tipo == MovimentacaoEstoque.TIPO_SAIDA else '—',
+            f'{m.preco_venda_unitario:.2f}' if m.preco_venda_unitario else 'â€”',
+            m.get_forma_pagamento_display() if m.forma_pagamento else 'â€”',
+            f'{m.parcelas}x' if m.forma_pagamento == 'CARTAO_CREDITO' and m.parcelas else ('Ã€ vista' if m.forma_pagamento else 'â€”'),
+            f'{m.lucro:.2f}' if m.tipo == MovimentacaoEstoque.TIPO_SAIDA else 'â€”',
             m.usuario.username,
             m.observacao or '',
         ])
@@ -518,10 +518,10 @@ def export_movimentacoes_csv(request):
 
 @login_required
 def relatorio_mensal_pdf(request):
-    """Gera e retorna PDF com relatório mensal de vendas."""
+    """Gera e retorna PDF com relatÃ³rio mensal de vendas."""
     user_lojas = get_user_lojas(request.user)
 
-    # Parâmetros
+    # ParÃ¢metros
     hoje = timezone.now().date()
     try:
         mes = int(request.GET.get('mes', hoje.month))
@@ -532,7 +532,7 @@ def relatorio_mensal_pdf(request):
 
     loja_id = request.GET.get('loja_id', '')
 
-    # Filtrar movimentações do tipo saída no mês/ano
+    # Filtrar movimentaÃ§Ãµes do tipo saÃ­da no mÃªs/ano
     movimentacoes = MovimentacaoEstoque.objects.filter(
         tipo=MovimentacaoEstoque.TIPO_SAIDA,
         criado_em__year=ano,
@@ -559,3 +559,23 @@ def relatorio_mensal_pdf(request):
     response = HttpResponse(buffer.read(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="relatorio_vendas_{mes:02d}_{ano}.pdf"'
     return response
+
+@login_required
+def movimentacao_geral_create_view(request):
+    if request.method == 'POST':
+        form = MovimentacaoEstoqueGeralForm(request.POST)
+        if form.is_valid():
+            movimentacao = form.save(commit=False)
+            produto = form.cleaned_data['produto']
+            if not is_admin_master(request.user) and produto.loja.responsavel != request.user:
+                raise PermissionDenied('Você não tem permissão para movimentar o estoque deste produto.')
+            movimentacao.usuario = request.user
+            movimentacao.save()
+            messages.success(request, f'Movimentação de {movimentacao.get_tipo_display()} registrada com sucesso para {produto.nome}!')
+            return redirect('estoque:movimentacao_list')
+    else:
+        form = MovimentacaoEstoqueGeralForm()
+    context = {'form': form}
+    return render(request, 'estoque/movimentacao_geral_form.html', context)
+
+

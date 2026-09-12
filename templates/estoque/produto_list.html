@@ -9,9 +9,7 @@
         <p class="text-muted mb-0">O que a loja vende. Clique em “Novo produto” para cadastrar; use as setas na linha para registrar entrada ou venda.</p>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
-        <a href="{% url 'estoque:export_produtos_csv' %}" class="btn btn-secondary-custom">
-            <i class="bi bi-download me-1"></i> Exportar CSV
-        </a>
+
         <a href="{% url 'estoque:produto_create' %}" class="btn btn-primary-custom">
             <i class="bi bi-plus-lg me-1"></i> Novo Produto
         </a>

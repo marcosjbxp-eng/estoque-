@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Acesso Negado — 403{% endblock %}
+{% block content %}
+<div class="glass-panel p-5 text-center my-4">
+    <h1 class="text-white fw-bold mb-1">403 - Acesso Negado</h1>
+    <p class="text-muted mb-4">Ops! Você não tem permissão para acessar esta página.</p>
+    
+    <div style="max-width: 300px; margin: 0 auto;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="231" height="289" viewBox="0 0 231 289" class="fantasminha">
+        <defs>
+          <clipPath id="shapeClip">
+            <path d="M230.809 115.385V249.411C230.809 269.923 214.985 287.282 194.495 288.411C184.544 288.949 175.364 285.718 168.26 280C159.746 273.154 147.769 273.461 139.178 280.23C132.638 285.384 124.381 288.462 115.379 288.462C106.377 288.462 98.1451 285.384 91.6055 280.23C82.912 273.385 70.9353 273.385 62.2415 280.23C55.7532 285.334 47.598 288.411 38.7246 288.462C17.4132 288.615 0 270.667 0 249.359V115.385C0 51.6667 51.6756 0 115.404 0C179.134 0 230.809 51.6667 230.809 115.385Z" />
+          </clipPath>
+          <linearGradient id="meshGradient" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#FFB3D9"/>
+            <stop offset="25%" stop-color="#87CEEB"/>
+            <stop offset="50%" stop-color="#4A90E2"/>
+            <stop offset="75%" stop-color="#2C3E50"/>
+            <stop offset="100%" stop-color="#1A1A2E"/>
+          </linearGradient>
+        </defs>
+        <rect width="231" height="289" fill="url(#meshGradient)" clip-path="url(#shapeClip)" />
+        <ellipse cx="80" cy="120" rx="20" ry="30" fill="white" class="animate-blink" />
+        <ellipse cx="150" cy="120" rx="20" ry="30" fill="white" class="animate-blink" />
+      </svg>
+      <style>
+        .fantasminha { animation: float 2.8s infinite ease-in-out; transform-origin: top center; width:100%; height:auto; }
+        @keyframes float { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-8px) scaleY(1.08); } }
+        .animate-blink { animation: blink 3s infinite ease-in-out; }
+        @keyframes blink { 0%, 90%, 100% { ry: 30; } 95% { ry: 3; } }
+      </style>
+    </div>
+    <br>
+    <a href="/" class="btn btn-primary-custom mt-3">Voltar ao início</a>
+</div>
+{% endblock %}

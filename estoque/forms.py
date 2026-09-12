@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from django.forms import inlineformset_factory
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -13,10 +13,10 @@ VIDEO_EXTENSIONS = ('.mp4', '.mov', '.webm', '.avi')
 
 def validar_tamanho_imagem(file):
     if file and file.size > MAX_IMAGE_SIZE_BYTES:
-        raise ValidationError(f"O tamanho máximo permitido por imagem é {MAX_IMAGE_SIZE_MB}MB.")
+        raise ValidationError(f"O tamanho mÃ¡ximo permitido por imagem Ã© {MAX_IMAGE_SIZE_MB}MB.")
 
 def obter_duracao_video(file):
-    """Obtém a duração do vídeo em segundos usando ffprobe se disponível."""
+    """ObtÃ©m a duraÃ§Ã£o do vÃ­deo em segundos usando ffprobe se disponÃ­vel."""
     if not file:
         return None
     import shutil
@@ -68,19 +68,19 @@ def validar_video(file):
     import os
     ext = os.path.splitext(file.name)[1].lower()
     if ext not in VIDEO_EXTENSIONS:
-        raise ValidationError(f"Formato de vídeo não suportado. Use: {', '.join(VIDEO_EXTENSIONS)}")
+        raise ValidationError(f"Formato de vÃ­deo nÃ£o suportado. Use: {', '.join(VIDEO_EXTENSIONS)}")
     if file.size > MAX_VIDEO_SIZE_BYTES:
-        raise ValidationError(f"O tamanho máximo permitido por vídeo é {MAX_VIDEO_SIZE_MB}MB.")
+        raise ValidationError(f"O tamanho mÃ¡ximo permitido por vÃ­deo Ã© {MAX_VIDEO_SIZE_MB}MB.")
     
     duracao = obter_duracao_video(file)
     if duracao is not None and duracao > (MAX_VIDEO_DURATION_SECONDS + 0.5):
         raise ValidationError(
-            f"O vídeo de vendas deve ter no máximo 15 segundos de duração (duração detectada: {duracao:.1f}s)."
+            f"O vÃ­deo de vendas deve ter no mÃ¡ximo 15 segundos de duraÃ§Ã£o (duraÃ§Ã£o detectada: {duracao:.1f}s)."
         )
 
 
 def otimizar_video(file, manter_audio=True):
-    """Comprime e converte o vídeo com ffmpeg para alta qualidade visual e compatibilidade total com MOV/iPhone."""
+    """Comprime e converte o vÃ­deo com ffmpeg para alta qualidade visual e compatibilidade total com MOV/iPhone."""
     if not file or not hasattr(file, 'chunks'):
         return file
     import shutil
@@ -103,7 +103,7 @@ def otimizar_video(file, manter_audio=True):
             in_path = in_tmp.name
 
         out_path = in_path + '_opt.mp4'
-        # Se manter_audio=False, remove áudio completamente (-an). Senão, AAC 192k
+        # Se manter_audio=False, remove Ã¡udio completamente (-an). SenÃ£o, AAC 192k
         audio_params = ['-acodec', 'aac', '-b:a', '192k'] if manter_audio else ['-an']
 
         cmd = [
@@ -145,7 +145,7 @@ class ProdutoForm(forms.ModelForm):
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iPhone 15 Pro Max'}),
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: iphone-15-pro-max (opcional: gerado automaticamente)'}),
             'sku': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: IPH-15PM-256'}),
-            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descrição detalhada do produto...'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'DescriÃ§Ã£o detalhada do produto...'}),
             'preco_custo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
             'preco_venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
             'quantidade_atual': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': '0'}),
@@ -218,10 +218,10 @@ class MovimentacaoEstoqueForm(forms.ModelForm):
         widgets = {
             'tipo': forms.Select(attrs={'class': 'form-select', 'id': 'id_tipo_movimentacao'}),
             'quantidade': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Quantidade'}),
-            'preco_venda_unitario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Preço praticado'}),
+            'preco_venda_unitario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'PreÃ§o praticado'}),
             'forma_pagamento': forms.Select(attrs={'class': 'form-select', 'id': 'id_forma_pagamento'}),
-            'parcelas': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 24, 'placeholder': 'Nº de parcelas', 'id': 'id_parcelas'}),
-            'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Observação opcional (ex: Venda balcão / Reposição)'}),
+            'parcelas': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 24, 'placeholder': 'NÂº de parcelas', 'id': 'id_parcelas'}),
+            'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'ObservaÃ§Ã£o opcional (ex: Venda balcÃ£o / ReposiÃ§Ã£o)'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -229,7 +229,7 @@ class MovimentacaoEstoqueForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.produto:
             self.fields['preco_venda_unitario'].initial = self.produto.preco_venda
-        # Tornar forma_pagamento não obrigatório no form (validação manual no clean)
+        # Tornar forma_pagamento nÃ£o obrigatÃ³rio no form (validaÃ§Ã£o manual no clean)
         self.fields['forma_pagamento'].required = False
         self.fields['parcelas'].required = False
 
@@ -242,22 +242,22 @@ class MovimentacaoEstoqueForm(forms.ModelForm):
         parcelas = cleaned_data.get('parcelas')
 
         if not self.produto:
-            raise ValidationError("Produto não informado para esta movimentação.")
+            raise ValidationError("Produto nÃ£o informado para esta movimentaÃ§Ã£o.")
 
         if tipo == MovimentacaoEstoque.TIPO_SAIDA:
             if preco_venda_unitario is None:
-                self.add_error('preco_venda_unitario', "Informe o preço de venda unitário para a movimentação de saída.")
+                self.add_error('preco_venda_unitario', "Informe o preÃ§o de venda unitÃ¡rio para a movimentaÃ§Ã£o de saÃ­da.")
 
             if not forma_pagamento:
                 self.add_error('forma_pagamento', "Informe a forma de pagamento para registrar a venda.")
 
             if forma_pagamento == MovimentacaoEstoque.PAGAMENTO_CREDITO:
                 if not parcelas or parcelas < 1:
-                    self.add_error('parcelas', "Informe o número de parcelas para pagamento com Cartão de Crédito.")
+                    self.add_error('parcelas', "Informe o nÃºmero de parcelas para pagamento com CartÃ£o de CrÃ©dito.")
 
             if quantidade and quantidade > self.produto.quantidade_atual:
                 raise ValidationError(
-                    f"Operação negada: quantidade solicitada ({quantidade}) é maior do que a quantidade disponível em estoque ({self.produto.quantidade_atual})."
+                    f"OperaÃ§Ã£o negada: quantidade solicitada ({quantidade}) Ã© maior do que a quantidade disponÃ­vel em estoque ({self.produto.quantidade_atual})."
                 )
 
         return cleaned_data
@@ -298,7 +298,7 @@ class UsuarioCreateForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email']
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome de usuário (login)'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome de usuÃ¡rio (login)'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Sobrenome'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'email@exemplo.com'}),
@@ -309,7 +309,7 @@ class UsuarioCreateForm(forms.ModelForm):
         password = cleaned_data.get('password')
         password_confirm = cleaned_data.get('password_confirm')
         if password and password_confirm and password != password_confirm:
-            self.add_error('password_confirm', 'As senhas não coincidem.')
+            self.add_error('password_confirm', 'As senhas nÃ£o coincidem.')
         return cleaned_data
 
     def save(self, commit=True):
@@ -370,3 +370,16 @@ class UsuarioEditForm(forms.ModelForm):
             else:
                 user.groups.remove(group)
         return user
+
+class MovimentacaoEstoqueGeralForm(MovimentacaoEstoqueForm):
+    class Meta(MovimentacaoEstoqueForm.Meta):
+        fields = ['produto'] + MovimentacaoEstoqueForm.Meta.fields
+        widgets = MovimentacaoEstoqueForm.Meta.widgets.copy()
+        widgets['produto'] = forms.Select(attrs={'class': 'form-select', 'id': 'id_produto'})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['produto'].required = True
+        self.fields['preco_venda_unitario'].initial = None
+
+
