@@ -63,31 +63,6 @@
                         <span class="text-[11px] mt-1 text-neutral-500">Sem imagem</span>
                     </div>
                 {% endif %}
-
-                <!-- Badges de Estoque -->
-                <div class="absolute top-2.5 left-2.5 flex flex-col gap-1">
-                    {% if produto.quantidade_atual > 0 %}
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 backdrop-blur-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Em estoque
-                        </span>
-                    {% else %}
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-950/80 text-rose-400 border border-rose-500/30 backdrop-blur-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Esgotado
-                        </span>
-                    {% endif %}
-                </div>
-
-                <!-- Badge de Vídeo (se houver) -->
-                {% if produto.video %}
-                <div class="absolute top-2.5 right-2.5">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-neutral-900/90 text-neutral-200 border border-neutral-700/80 backdrop-blur-sm">
-                        <svg class="w-2.5 h-2.5 text-brandBlue fill-current" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        Vídeo
-                    </span>
-                </div>
-                {% endif %}
             </a>
 
             <!-- Informações -->
