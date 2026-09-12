@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from .models import Loja, Produto, ProdutoFoto, MovimentacaoEstoque
 from .forms import (
     ProdutoForm, ProdutoFotoFormSet, MovimentacaoEstoqueForm, MovimentacaoEstoqueGeralForm,
-    LojaForm, UsuarioForm, UsuarioCreateForm, UsuarioEditForm,
+    LojaForm, UsuarioCreateForm, UsuarioEditForm,
 )
 from .mixins import is_admin_master, get_user_lojas
 from .relatorio_pdf import gerar_relatorio_pdf
