@@ -247,11 +247,7 @@
 {% if user.is_authenticated %}
 <aside class="app-sidebar d-none d-lg-flex flex-column">
     <a class="app-sidebar-brand" href="{% url 'estoque:dashboard' %}">
-        <span class="app-sidebar-mark"><i class="bi bi-box-seam"></i></span>
-        <span>
-            <strong>Felipe Cell</strong>
-            <small>Estoque</small>
-        </span>
+        <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell" style="height: 38px; width: auto; max-width: 175px; object-fit: contain;">
     </a>
     <nav class="app-sidebar-nav">
         <p class="app-nav-label">Operação</p>
@@ -286,6 +282,9 @@
             <button class="app-menu-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-label="Abrir menu">
                 <i class="bi bi-list"></i>
             </button>
+            <a href="{% url 'estoque:dashboard' %}" class="d-lg-none d-flex align-items-center me-2">
+                <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell" style="height: 28px; width: auto; object-fit: contain;">
+            </a>
             <div class="d-none d-sm-flex align-items-center gap-2 text-muted" style="font-size: 0.8rem;">
                 <span class="text-white fw-semibold">Felipe Cell</span>
                 <span class="text-secondary opacity-50">/</span>
@@ -320,8 +319,7 @@
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container-fluid px-4">
             <a class="navbar-brand d-flex align-items-center gap-2 text-white text-decoration-none" href="{% url 'login' %}">
-                <i class="bi bi-box-seam fs-4" style="color: #1e61e8;"></i>
-                <span class="fw-bold tracking-tight">Felipe Cell</span>
+                <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell" style="height: 32px; width: auto; object-fit: contain;">
             </a>
             <a href="{% url 'loja:catalogo' %}" class="btn btn-sm btn-secondary-custom rounded-pill px-3">Ver loja</a>
         </div>
@@ -343,8 +341,8 @@
 </div>
 
 <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="mobileNav">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Menu</h5>
+    <div class="offcanvas-header border-bottom border-secondary border-opacity-25 pb-3">
+        <img src="{% static 'imgs/logob001.png' %}" alt="Felipe Cell" style="height: 28px; width: auto; object-fit: contain;">
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
     </div>
     <div class="offcanvas-body d-flex flex-column gap-2">
